@@ -1,0 +1,19 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "wave.png",
+  "grid": {
+    "columns": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "prompts": [
+    {
+      "name": "idle",
+      "prompt": "Use case: illustration-story. Production sprite sheet for a tiny personal Cinnamoroll desktop pet. Attached wave sheet is the exact CHARACTER IDENTITY and drawing-style reference only; remove wave action. Match its clean warm cinnamon-brown outlines, line weight, white coat, subtle cool-white soft shading, bright blue oval eyes, tiny tan mouth, pale pink cheeks, very long floppy ears and small spiral tail. Exactly TWO arms, TWO feet, TWO ears. Exactly EIGHT full-body frames in uniform FOUR columns by TWO rows grid, read left to right top then bottom. Same scale, camera and body proportions in every frame. MAX75 percent cell width/height, each silhouette has 40px transparent margins on all sides, entire ear tips and feet fit safely inside each cell. Transparent background, clean alpha, no text, lines, grid, labels, shadows, scenery, watermark, disconnected flecks, duplicate limbs or human hand.\nAction: quiet RESTING STANDING pose facing front, paws relaxed at sides of chest, friendly tiny neutral smile, ears at natural relaxed angle. This must look like the neutral first pose in the reference, same head/body proportions and coat/outline colors. Almost motionless restful breathing only. Frame1 neutral open blue eyes;2 subtle inhale with chest 1 percent fuller;3 relaxed exhale, eyes still open;4 half-closed eyelids;5 eyes completely closed for a natural blink;6 half-opening eyelids;7 fully open neutral;8 fully open neutral exactly matching frame1. Feet planted, crown/head center and ear positions remain nearly identical throughout, no bouncing, no head turns, no cheek-paw pose. All frames same ground baseline. This is the DEFAULT companion appearance, refined and calm."
+    },
+    {
+      "name": "hanging",
+      "prompt": "Use case: illustration-story. Production sprite sheet for a tiny personal Cinnamoroll desktop pet. Attached wave sheet is the exact CHARACTER IDENTITY and drawing-style reference only; remove wave action. Match its clean warm cinnamon-brown outlines, line weight, white coat, subtle cool-white soft shading, bright blue oval eyes, tiny tan mouth, pale pink cheeks, very long floppy ears and small spiral tail. Exactly TWO arms, TWO feet, TWO ears. Exactly EIGHT full-body frames in uniform FOUR columns by TWO rows grid, read left to right top then bottom. Same scale, camera and body proportions in every frame. MAX75 percent cell width/height, each silhouette has 40px transparent margins on all sides, entire ear tips and feet fit safely inside each cell. Transparent background, clean alpha, no text, lines, grid, labels, shadows, scenery, watermark, disconnected flecks, duplicate limbs or human hand.\nAction: an airborne HANGING/DANGLING pose as if gently picked up. Front view, head and face remain upright and anchored to EXACTLY the same x/y position in ALL eight frames. Match the reference head size and neutral body proportions; body only slightly extended below head, NOT stretched like rubber. BOTH arms loosely dangle downward beside torso, BOTH little feet hang freely with slight knee bend; ears droop gently with tips remaining wide. Gentle slow eight-frame loop: lower paws/feet sway a tiny bit left then center then right then center; head stays STILL, eyes open then one soft blink, small surprised but content mouth. No walking or standing posture, no marching, no vigorous kicking, no big angle changes. Do NOT draw a cursor, grip knob, hand, rope, harness or extra limb. Nothing touching or grabbing the top of his head. Entire hanging silhouette centered with generous margins; no detached paws. Frame8 returns smoothly to frame1."
+    }
+  ]
+}

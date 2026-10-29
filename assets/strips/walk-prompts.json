@@ -1,0 +1,19 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "revisions/walk-v1.png",
+  "grid": {
+    "columns": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "prompt": "Production eight-frame Cinnamoroll WALK CYCLE sprite sheet. Attached existing walk sheet is the exact character, art style, warm fine cinnamon-brown outline, proportions, palette and side-profile reference. Repair its FOOTWORK: currently too many poses look planted. Replace with a genuinely continuous, smooth 8-phase looping BIPED WALK IN PLACE facing RIGHT, exactly FOUR equal columns by TWO equal rows. One entire consistent character per cell, head and body same scale and mostly steady, two arms and two feet, very long ears trailing gently behind LEFT, cyan eye and pink cheek, tiny curled tail at rear LEFT. Strong but cute readable foot alternation with no duplicate or held foot poses: frame1 near foot forward touching ground heel, far foot behind toes touching; frame2 near foot supports body, far foot lifts behind; frame3 far foot swings forward passing beside planted near foot, bent knee; frame4 far foot reaches forward while near heel lifts; frame5 far foot forward contacts and near foot behind; frame6 far foot supports, near foot lifts behind; frame7 near foot swings forward passing planted far foot, bent knee; frame8 near foot reaches forward ready to contact frame1. Both feet remain attached through legs and distinguishable without extra legs. Subtle opposite front-paw swing synchronized to legs. Gentle small walk, NOT run, NO airborne two-foot hops, NO standing hold, NO foot-pose repeats, NO crouch, no pause in the loop. Very little vertical bob, no horizontal movement within cells. All ground contact points share a fixed baseline, identical head scale and horizontal center. Frame8 transitions seamlessly into frame1. Leave 40px transparent gutter inside every cell; both ears, paws, feet and entire tail fully inside each cell. Exact eight complete full-body poses. Genuine transparent alpha background. No arrows, text, labels, grid, floor, backdrop, shadows, motion lines, duplicate silhouettes or accessories. Match the existing reference's refined soft pastel illustration, no realism or grain.",
+  "playback": [
+    0,
+    1,
+    2,
+    4,
+    5,
+    6
+  ],
+  "timing": "Distance-driven cycle; omit redundant planted contact frames."
+}

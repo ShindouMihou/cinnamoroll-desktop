@@ -1,0 +1,87 @@
+[
+  {
+    "activity": "idle",
+    "weight": 26,
+    "cooldown_seconds": 8
+  },
+  {
+    "activity": "blink",
+    "weight": 12,
+    "cooldown_seconds": 12
+  },
+  {
+    "activity": "look_around",
+    "weight": 15,
+    "cooldown_seconds": 18
+  },
+  {
+    "activity": "wave",
+    "weight": 6,
+    "cooldown_seconds": 45
+  },
+  {
+    "activity": "stretch",
+    "weight": 8,
+    "cooldown_seconds": 40
+  },
+  {
+    "activity": "walk",
+    "weight": 14,
+    "cooldown_seconds": 22
+  },
+  {
+    "activity": "run",
+    "weight": 3,
+    "cooldown_seconds": 90
+  },
+  {
+    "activity": "nap",
+    "weight": 4,
+    "cooldown_seconds": 120
+  },
+  {
+    "activity": "snack",
+    "weight": 5,
+    "cooldown_seconds": 95
+  },
+  {
+    "activity": "read",
+    "weight": 5,
+    "cooldown_seconds": 100
+  },
+  {
+    "activity": "play",
+    "weight": 5,
+    "cooldown_seconds": 65
+  },
+  {
+    "activity": "dance",
+    "weight": 3,
+    "cooldown_seconds": 90
+  },
+  {
+    "activity": "curious",
+    "weight": 6,
+    "cooldown_seconds": 45
+  },
+  {
+    "activity": "shy",
+    "weight": 3,
+    "cooldown_seconds": 80
+  },
+  {
+    "activity": "excited",
+    "weight": 2,
+    "cooldown_seconds": 100
+  },
+  {
+    "activity": "drowsy",
+    "weight": 4,
+    "cooldown_seconds": 90
+  },
+  {
+    "activity": "edge_peek",
+    "weight": 2,
+    "cooldown_seconds": 600
+  }
+]

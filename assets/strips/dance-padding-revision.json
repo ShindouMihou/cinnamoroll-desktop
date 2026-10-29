@@ -1,0 +1,6 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve sprite-sheet repair. Edit this Cinnamoroll dancing sheet only to fix sprite cell padding. Preserve exactly the same character style, colors and eight dance poses, two arms/two feet. Keep layout FOUR columns TWO rows equally sized cells and real transparent background. Make EVERY character uniformly 20 percent SMALLER within its own cell, centered, so BOTH ear tips have at least 40px of empty transparent space from the left/right boundaries of that cell. No ear may cross into a neighboring cell. All eight entire silhouettes must be completely visible, unclipped, separated by generous transparent gutters. Do not add graphics, specks, text, grid lines, shadows or background. Clean alpha. Frame order left to right top to bottom. Preserve gentle dance.",
+  "reference": "dance initial generated sheet",
+  "reason": "Keep both ears inside each frame with transparent gutters"
+}

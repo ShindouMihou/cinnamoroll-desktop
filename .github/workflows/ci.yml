@@ -1,0 +1,31 @@
+name: Cozy checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-15-intel, windows-2025]
+    runs-on: ${{ matrix.os }}
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '13.0'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install stable --profile minimal --component clippy,rustfmt
+      - run: cargo +stable build --locked --features bundled-sdl,updater
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-ChildItem target/debug/build -Recurse -Filter SDL3.dll |
+            ForEach-Object { $_.DirectoryName } | Select-Object -Unique |
+            ForEach-Object { Add-Content $env:GITHUB_PATH $_ }
+      - run: cargo +stable fmt --check
+      - run: cargo +stable clippy --locked --all-targets --features bundled-sdl,updater -- -D warnings
+      - run: cargo +stable test --locked --features bundled-sdl,updater

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+    <key>CFBundleName</key><string>Cinnamoroll</string>
+    <key>CFBundleDisplayName</key><string>Cinnamoroll</string>
+    <key>CFBundleExecutable</key><string>Cinnamoroll</string>
+    <key>CFBundleIconFile</key><string>Cinnamoroll.icns</string>
+    <key>CFBundleIdentifier</key><string>personal.cinnamoroll.desktop</string>
+    <key>CFBundleVersion</key><string>2</string>
+    <key>CFBundleShortVersionString</key><string>0.1.0</string>
+    <key>CFBundlePackageType</key><string>APPL</string>
+    <key>LSMinimumSystemVersion</key><string>13.0</string>
+    <key>LSUIElement</key><true/>
+    <key>LSBackgroundOnly</key><false/>
+    <key>NSPrincipalClass</key><string>NSApplication</string>
+    <key>NSHighResolutionCapable</key><true/>
+    <key>NSAppleEventsUsageDescription</key><string>Cinnamoroll checks whether Music or Spotify is playing so he can listen along. This is optional.</string>
+</dict></plist>

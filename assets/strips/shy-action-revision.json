@@ -1,0 +1,6 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: identity-preserve. Repair only the ACTION of this transparent Cinnamoroll shy sprite sheet: make it clearly BASHFUL instead of just blinking. Preserve the exact white puppy identity, long ears, blue eyes, pink cheeks, cinnamon outline and soft shading. EXACTLY eight frames in FOUR columns TWO rows, uniform scale, full body, large transparent gutters at least40px in EVERY cell, no cropping. Frame1 timid neutral eyes lowered;2 cheeks blush brighter and BOTH paws rise;3 both paws touch lower cheeks;4 head dips while paws partly hide the tiny mouth;5 eyes close bashfully while paws cover mouth and cheeks;6 peeks out shyly with blue eyes while paws stay at cheeks;7 head lifts slightly and paws start lowering;8 timid neutral with stronger blush. Exactly TWO arms attached to body and TWO feet throughout. No third paw, no extra limbs. Keep feet planted on shared baseline. Do not dance, hop, wave or draw a separate human hand. No props, hearts, text, grid lines, white background or specks. Genuine transparent background.",
+  "reason": "Make shyness distinct from the existing blink",
+  "reference": "shy initial generated sheet"
+}

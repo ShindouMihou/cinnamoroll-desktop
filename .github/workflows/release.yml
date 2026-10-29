@@ -1,0 +1,131 @@
+name: Pack a little release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag, such as v0.1.0
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ inputs.tag }}
+  cancel-in-progress: false
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            target: aarch64-apple-darwin
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+          - os: windows-2025
+            target: x86_64-pc-windows
+    runs-on: ${{ matrix.os }}
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '13.0'
+      RELEASE_TAG: ${{ inputs.tag }}
+      RELEASE_TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ inputs.tag }}
+          persist-credentials: false
+      - name: Match the tag to the source
+        shell: python
+        run: |
+          import os, tomllib
+          from pathlib import Path
+          version = tomllib.loads(Path('Cargo.toml').read_text(encoding='utf-8'))['package']['version']
+          if os.environ['RELEASE_TAG'] != 'v' + version:
+              raise SystemExit('The requested tag must match Cargo.toml')
+      - run: rustup toolchain install stable --profile minimal --component clippy,rustfmt
+      - run: cargo +stable build --locked --features bundled-sdl,updater
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-ChildItem target/debug/build -Recurse -Filter SDL3.dll |
+            ForEach-Object { $_.DirectoryName } | Select-Object -Unique |
+            ForEach-Object { Add-Content $env:GITHUB_PATH $_ }
+      - run: cargo +stable fmt --check
+      - run: cargo +stable clippy --locked --all-targets --features bundled-sdl,updater -- -D warnings
+      - run: cargo +stable test --locked --features bundled-sdl,updater
+      - run: python scripts/collect-licenses.py
+      - if: runner.os == 'macOS'
+        run: ./scripts/bundle-macos.sh
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./scripts/bundle-windows.ps1
+          ./dist/Cinnamoroll-Windows/Check-Windows.ps1
+      - run: cargo +stable install zipsign --version 0.2.1 --locked
+      - name: Prepare the signing files
+        shell: python
+        env:
+          UPDATE_SIGNING_KEY: ${{ secrets.CINNAMOROLL_UPDATE_SIGNING_KEY }}
+        run: |
+          import base64, json, os
+          from pathlib import Path
+          key = base64.b64decode(os.environ['UPDATE_SIGNING_KEY'], validate=True)
+          public = bytes.fromhex(json.loads(Path('packaging/update-channel.json').read_text())['public_key'])
+          if len(key) != 64 or key[32:] != public:
+              raise SystemExit('The signing secret does not match the public update key')
+          path = Path(os.environ['RUNNER_TEMP']) / 'cinnamoroll-signing.key'
+          path.write_bytes(key)
+          path.chmod(0o600)
+      - name: Sign and verify the complete app
+        shell: python
+        run: |
+          import os, subprocess
+          from pathlib import Path
+          subprocess.run(['python', 'scripts/prepare-release.py', '--target', os.environ['RELEASE_TARGET'], '--key', str(Path(os.environ['RUNNER_TEMP']) / 'cinnamoroll-signing.key')], check=True)
+      - name: Remove the temporary signing file
+        if: always()
+        shell: python
+        run: |
+          import os
+          from pathlib import Path
+          (Path(os.environ['RUNNER_TEMP']) / 'cinnamoroll-signing.key').unlink(missing_ok=True)
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: ${{ matrix.target }}
+          path: dist/releases/*
+          if-no-files-found: error
+          retention-days: 7
+  draft:
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ inputs.tag }}
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          path: dist/releases
+          merge-multiple: true
+      - run: python scripts/prepare-release.py --source-only
+      - name: Create or refresh a draft
+        shell: python
+        run: |
+          import hashlib, os, subprocess
+          from pathlib import Path
+          folder = Path('dist/releases')
+          assets = sorted(folder.glob('*.zip'))
+          (folder / 'SHA256SUMS').write_text(''.join(hashlib.file_digest(path.open('rb'), 'sha256').hexdigest() + '  ' + path.name + '\n' for path in assets))
+          tag = os.environ['RELEASE_TAG']
+          result = subprocess.run(['gh', 'release', 'view', tag, '--json', 'isDraft', '--jq', '.isDraft'], capture_output=True, text=True)
+          if result.returncode == 0:
+              if result.stdout.strip() != 'true':
+                  raise SystemExit('A published release is never overwritten')
+          else:
+              subprocess.run(['gh', 'release', 'create', tag, '--verify-tag', '--draft', '--title', 'Cinnamoroll ' + tag + ' · A little company', '--notes-file', 'docs/releases/' + tag + '.md'], check=True)
+          subprocess.run(['gh', 'release', 'upload', tag, *map(str, assets), str(folder / 'SHA256SUMS'), '--clobber'], check=True)

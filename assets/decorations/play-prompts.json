@@ -1,0 +1,18 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "cozy-bed-source.png",
+  "prompts": [
+    {
+      "name": "play-cups",
+      "prompt": "Production game prop atlas, illustration-story. Attached plush bed is STYLE REFERENCE ONLY: fine smooth warm cinnamon-brown outline, soft pastel shading, clean rounded dimensional shapes, no realism or grain. Exactly FOUR isolated props in a perfect TWO COLUMNS TWO ROWS grid, generous identical transparent gutters. Cell1 one small inverted pastel cloud-BLUE cup, cell2 same exact inverted cup in blush PINK, cell3 same exact inverted cup in pale LILAC, cell4 one tiny warm yellow plush STAR toy with a cute tiny simple face. All three cups EXACTLY same design, size, perspective, baseline. Cups are UPSIDE DOWN for a shell game: narrower closed flat oval base at TOP, gently widening down to a softly rounded wide rim resting on imaginary floor. No open drinking surface, no handles, no extra cups. Sweet subtle small white cloud emblem on front of each cup, understated rim highlights and soft cloth-like/pastel finish, readable at tiny sprite size. One object per cell, full object inside cell with 40px padding on every side; cups centered, entire silhouettes fully visible. Star is separate in cell4, no cup beside star. Genuine transparent alpha background, no floor shadow, no backdrop, no labels, no grid lines, no text, no character, no bed."
+    },
+    {
+      "name": "play-ribbon",
+      "prompt": "Production desktop game prop, illustration-story. Attached plush bed is STYLE REFERENCE ONLY: soft pastel shading, fine warm cinnamon-brown outline, clean rounded cozy finish matching Cinnamoroll. Draw ONE simple tactile ribbon toy, not a wand, not a wire: small padded blush-pink BOW at the RIGHT end, with one long soft satin ribbon tail gently snaking LEFT along a shallow horizontal S curve. Loose ribbon END is at LOWER LEFT, easy for a puppy paw to tap. Broad flat satin ribbon fabric, softly shaded folded edges, pale pink main fabric with soft lilac underside, bow two plump loops and one neat knot. Compact low wide composition about 1.6 times wider than tall, mostly empty transparent space above it. Entire bow and entire tail inside canvas, no clipping, transparent padding on every side. Same warm refined outline quality as reference, no stiff tube/wire, no baton or round bobble, no tangled knots or multiple stray ribbons, no surrounding props, no character, no bed, no hand, no text, no floor shadow, genuine transparent alpha background."
+    },
+    {
+      "name": "play-wand",
+      "prompt": "Production desktop game prop, illustration-story. Attached plush bed is STYLE REFERENCE ONLY, match warm cinnamon-brown fine smooth outline and softly shaded pastel illustration. ONE clearly recognizable cat-style toy wand: short rounded pale-lavender HANDLE at LOWER LEFT, slim flexible stick gently angled upward to RIGHT, short softly curved string at far RIGHT ending in a fluffy small cloud-blue pompom at UPPER RIGHT. One little blush bow at the pompom-string join. Low wide isolated composition about 1.6 times wider than tall, not tall vertical. Distinguish handle, stick, string, pompom clearly so user can understand dragging the handle and the puppy batting the pompom. Cute, very simple silhouette readable at small desktop sprite size, gentle rounded fabric highlights, no grain or photorealism. Entire prop fully inside canvas with generous transparent gutters, no clipping, no surrounding objects, no character, no bed, no labels or text, no ground or shadow. Genuine transparent alpha background."
+    }
+  ]
+}

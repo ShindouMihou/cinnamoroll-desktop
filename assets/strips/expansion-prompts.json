@@ -1,0 +1,31 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "snack.png",
+  "grid": {
+    "columns": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "prompts": [
+    {
+      "name": "petting",
+      "prompt": "Use case: illustration-story. Asset: transparent desktop-pet animation sprite sheet. Use the attached snack sheet ONLY as character/style reference; remove snack. Cinnamoroll: white puppy, very long floppy ears, blue eyes, pink cheeks, cinnamon-brown fine outlines, tiny spiral tail, soft clean shading. EXACTLY eight full-body frames in a uniform 4 columns by 2 rows grid, read left-to-right top-to-bottom. Each frame centered in its own square with generous transparent margins, entire ears and feet visible. Same anatomy, scale and ground baseline across all frames. Exactly two arms and two feet, no extra limbs, no human hand, no text, no labels, no grid lines, no watermark, no scenery. Genuine transparent background. Frames form a gentle seamless cycle. Match reference illustration quality.\nAnimation: Enjoying head pats: paws relaxed beside tummy, eyes close contentedly, head dips gently, ears soften and subtly rise again, warm blush and tiny contented smile. No hand or prop. Frame1 eyes half closed,2 closing,3 dip,4 deeper contented dip,5 slight head lean,6 relax,7 lift,8 returns almost to1."
+    },
+    {
+      "name": "dance",
+      "prompt": "Use case: illustration-story. Asset: transparent desktop-pet animation sprite sheet. Use the attached snack sheet ONLY as character/style reference; remove snack. Cinnamoroll: white puppy, very long floppy ears, blue eyes, pink cheeks, cinnamon-brown fine outlines, tiny spiral tail, soft clean shading. EXACTLY eight full-body frames in a uniform 4 columns by 2 rows grid, read left-to-right top-to-bottom. Each frame centered in its own square with generous transparent margins, entire ears and feet visible. Same anatomy, scale and ground baseline across all frames. Exactly two arms and two feet, no extra limbs, no human hand, no text, no labels, no grid lines, no watermark, no scenery. Genuine transparent background. Frames form a gentle seamless cycle. Match reference illustration quality.\nAnimation: Cute dancing: a gentle two-step dance with left and right weight shifts, alternating tiny paw raises, small bent-knee bounces, floppy ears following the rhythm. No spinning or acrobatics. Feet stay close to the ground. Eight clearly distinct consecutive poses going left step then right step and returning."
+    },
+    {
+      "name": "wave",
+      "prompt": "Use case: illustration-story. Asset: transparent desktop-pet animation sprite sheet. Use the attached snack sheet ONLY as character/style reference; remove snack. Cinnamoroll: white puppy, very long floppy ears, blue eyes, pink cheeks, cinnamon-brown fine outlines, tiny spiral tail, soft clean shading. EXACTLY eight full-body frames in a uniform 4 columns by 2 rows grid, read left-to-right top-to-bottom. Each frame centered in its own square with generous transparent margins, entire ears and feet visible. Same anatomy, scale and ground baseline across all frames. Exactly two arms and two feet, no extra limbs, no human hand, no text, no labels, no grid lines, no watermark, no scenery. Genuine transparent background. Frames form a gentle seamless cycle. Match reference illustration quality.\nAnimation: Friendly greeting wave: one paw rises beside cheek, waves gently outward and inward three times then lowers. Other paw stays beside tummy; eyes bright blue then a happy blink. Keep ears relaxed, body upright."
+    },
+    {
+      "name": "read",
+      "prompt": "Use case: illustration-story. Asset: transparent desktop-pet animation sprite sheet. Use the attached snack sheet ONLY as character/style reference; remove snack. Cinnamoroll: white puppy, very long floppy ears, blue eyes, pink cheeks, cinnamon-brown fine outlines, tiny spiral tail, soft clean shading. EXACTLY eight full-body frames in a uniform 4 columns by 2 rows grid, read left-to-right top-to-bottom. Each frame centered in its own square with generous transparent margins, entire ears and feet visible. Same anatomy, scale and ground baseline across all frames. Exactly two arms and two feet, no extra limbs, no human hand, no text, no labels, no grid lines, no watermark, no scenery. Genuine transparent background. Frames form a gentle seamless cycle. Match reference illustration quality.\nAnimation: Reading a small pastel blue open picture book held in both paws: looks down at book, eyes follow page, slight thoughtful head tilt, happy blink, subtle page turn, returns. Book touches paws and body. Exactly two paws visible."
+    },
+    {
+      "name": "curious",
+      "prompt": "Use case: illustration-story. Asset: transparent desktop-pet animation sprite sheet. Use the attached snack sheet ONLY as character/style reference; remove snack. Cinnamoroll: white puppy, very long floppy ears, blue eyes, pink cheeks, cinnamon-brown fine outlines, tiny spiral tail, soft clean shading. EXACTLY eight full-body frames in a uniform 4 columns by 2 rows grid, read left-to-right top-to-bottom. Each frame centered in its own square with generous transparent margins, entire ears and feet visible. Same anatomy, scale and ground baseline across all frames. Exactly two arms and two feet, no extra limbs, no human hand, no text, no labels, no grid lines, no watermark, no scenery. Genuine transparent background. Frames form a gentle seamless cycle. Match reference illustration quality.\nAnimation: Curious peeking at your work: paws tucked together under chin, gentle head tilt toward lower right, blue eyes looking down curiously, small blink, head tilts gently toward lower left, returns. Keep head and ears connected naturally; no extreme turn, no question mark or separate graphics."
+    }
+  ]
+}

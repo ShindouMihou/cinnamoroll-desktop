@@ -1,0 +1,12 @@
+/target/
+/.tools/
+/dist/
+/work/
+.DS_Store
+
+*.key
+*.pem
+.secrets/
+
+__pycache__/
+*.py[cod]
