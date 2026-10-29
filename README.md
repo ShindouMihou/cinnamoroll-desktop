@@ -60,7 +60,7 @@ The Mac installer uses `/Applications`, with `~/Applications` as a fallback when
 
 Prefer a ZIP? Manual downloads work too.
 
-The first checkpoint is **v0.1.1**. Release downloads appear on the [Releases page](https://github.com/ShindouMihou/cinnamoroll-desktop/releases) once published.
+The first checkpoint is **v0.1.2**. Release downloads appear on the [Releases page](https://github.com/ShindouMihou/cinnamoroll-desktop/releases) once published.
 
 | Your computer | What to download | Then… |
 | --- | --- | --- |

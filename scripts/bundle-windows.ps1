@@ -1,7 +1,18 @@
 $ErrorActionPreference = 'Stop'
 $ProjectDir = Split-Path -Parent $PSScriptRoot
 Push-Location $ProjectDir
+$PreviousToolchain = $env:CMAKE_TOOLCHAIN_FILE
 try {
+    $Toolchain = Join-Path $ProjectDir 'target/cinnamoroll-msvc-runtime.cmake'
+    New-Item -ItemType Directory -Force -Path (Split-Path $Toolchain -Parent) | Out-Null
+    $Settings = @()
+    if ($PreviousToolchain) {
+        $Existing = [IO.Path]::GetFullPath($PreviousToolchain).Replace('\', '/')
+        $Settings += 'include("' + $Existing + '")'
+    }
+    $Settings += 'set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded" CACHE STRING "Cinnamoroll portable runtime" FORCE)'
+    [IO.File]::WriteAllLines($Toolchain, $Settings, [Text.UTF8Encoding]::new($false))
+    $env:CMAKE_TOOLCHAIN_FILE = $Toolchain
     $BuildFeatures = "bundled-sdl,updater"
     cargo build --release --locked --features $BuildFeatures
     if ($LASTEXITCODE -ne 0) { throw 'Rust build failed' }
@@ -19,7 +30,7 @@ try {
         $Imports = & $Dumpbin /dependents $Binary
         if ($LASTEXITCODE -ne 0) { throw 'Could not inspect the packaged executable or SDL library.' }
         if ($Imports -match '(?i)\b(vcruntime|msvcp|msvcr)[0-9][a-z0-9_]*\.dll\b') {
-            throw 'A packaged file needs a separate Visual C++ runtime. Build with the repository static-CRT configuration.'
+            throw "Portable runtime check failed for $Binary : $($Imports -join [Environment]::NewLine)"
         }
     }
     Copy-Item README.md, LICENSE, THIRD_PARTY_NOTICES.md $Destination
@@ -30,5 +41,6 @@ try {
     Compress-Archive -Force -Path $Destination -DestinationPath 'dist/Cinnamoroll-Windows.zip'
     Write-Output "Built $Destination"
 } finally {
+    $env:CMAKE_TOOLCHAIN_FILE = $PreviousToolchain
     Pop-Location
 }
