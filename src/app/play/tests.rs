@@ -195,13 +195,13 @@ fn study_transitions_and_cozy_rest_are_explicit_and_cancellable() {
     p.settings.focus_minutes = 1;
     p.settings.break_minutes = 1;
     p.companion_command(Command::StudyStart, 0.);
-    p.update_study(60.);
+    p.update_study(60., false);
     assert_eq!(
         p.companion.study.phase,
         crate::companion::study::Phase::Break
     );
     assert_eq!(p.brain.activity, Activity::Stretch);
-    p.update_study(120.);
+    p.update_study(120., false);
     assert_eq!(
         p.companion.study.phase,
         crate::companion::study::Phase::Ready
@@ -394,4 +394,79 @@ fn ribbon_and_wand_taps_finish_without_moving_or_restarting_when_the_toy_is_pull
         assert_eq!(pet.brain.activity, Activity::Watching);
         assert_eq!(pet.position, (0., 0.));
     }
+}
+
+#[test]
+fn new_moments_require_the_correct_gestures_and_keep_the_pet_stationary() {
+    use crate::companion::world::Kind;
+    let mut p = pet();
+    p.spawn_item(Kind::Dandelion, 0.);
+    p.advance_moment(1.);
+    assert_eq!(p.settings.extras.keepsakes, 0);
+    let head = (
+        p.position.0 + p.size().0 as f32 * 0.5,
+        p.position.1 + p.size().1 as f32 * 0.38,
+    );
+    let i = p.companion.item.as_mut().unwrap();
+    i.position = head;
+    i.held = true;
+    let before = p.position;
+    p.advance_moment(2.);
+    assert_eq!(p.brain.activity, Activity::Sneeze);
+    assert_eq!(p.settings.extras.keepsakes, 2);
+    assert_eq!(p.position, before);
+    p.spawn_item(Kind::Brush, 10.);
+    for (n, x) in [head.0 - 20., head.0, head.0 + 20.].into_iter().enumerate() {
+        let i = p.companion.item.as_mut().unwrap();
+        i.position = (x, head.1);
+        i.held = true;
+        p.advance_moment(10. + n as f64 * 0.1);
+    }
+    assert_eq!(p.brain.activity, Activity::Groom);
+    assert_eq!(p.settings.extras.keepsakes, 3);
+}
+
+#[test]
+fn dream_bubbles_obey_study_reduced_motion_and_low_battery() {
+    let mut p = pet();
+    p.play.mode = Mode::Sleeping;
+    p.update_moments(0., false);
+    p.update_moments(91., false);
+    assert!(p.companion.moments.dream.is_some());
+    p.update_moments(92., true);
+    assert!(p.companion.moments.dream.is_none());
+    p.companion.study.start(93., 25);
+    p.update_moments(999., false);
+    assert!(p.companion.moments.dream.is_none());
+    p.companion.study.stop();
+    p.settings.reduced_motion = true;
+    p.update_moments(1999., false);
+    assert!(p.companion.moments.dream.is_none());
+}
+
+#[test]
+fn sleep_pauses_study_and_reconnecting_a_display_restores_its_nook() {
+    let mut p = pet();
+    p.companion.study.start(0., 25);
+    p.update_study(5., false);
+    p.update_study(5000., true);
+    assert!(p.companion.study.paused);
+    assert_eq!(p.companion.study.view().seconds, 1495);
+    let display = Bounds {
+        x: -1200,
+        y: 0,
+        width: 1200,
+        height: 900,
+    };
+    p.settings.cozy_corner = true;
+    p.settings.extras.comfort.preferred_display = Some(display);
+    p.settings.extras.comfort.remember(display, (-900, 500));
+    p.restore_nook();
+    assert!(p.settings.corner_position.unwrap().0 >= 0);
+    let home = p.settings.corner_position.unwrap();
+    p.position = (home.0 as f32, home.1 as f32);
+    p.monitors.push(display);
+    p.restore_nook();
+    assert_eq!(p.settings.corner_position, Some((-900, 500)));
+    assert_eq!(p.position, (-900., 500.));
 }

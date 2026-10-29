@@ -4,6 +4,7 @@ use tiny_skia::{PathBuilder, Pixmap, Rect, Transform};
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Decoration {
     Corner(u8),
+    Dream(u8),
     Cups(crate::companion::games::CupVisual),
     Hint(&'static str),
     Ball,
@@ -18,6 +19,7 @@ pub(crate) fn render(kind: Decoration, size: (u32, u32), phase: f32) -> Result<P
     }
     let mut image = Pixmap::new(size.0, size.1).ok_or("Cannot allocate playroom artwork")?;
     let logical = match kind {
+        Decoration::Dream(_) => (160., 112.),
         Decoration::Corner(_) => (320., 112.),
         Decoration::Cups(_) => (160., 112.),
         Decoration::Bubbles(_) => (192., 160.),
@@ -29,8 +31,11 @@ pub(crate) fn render(kind: Decoration, size: (u32, u32), phase: f32) -> Result<P
         transform: Transform::from_scale(size.0 as f32 / logical.0, size.1 as f32 / logical.1),
     };
     match kind {
+        Decoration::Dream(kind) => super::moments::dream(&mut p, kind),
         Decoration::Prop(kind, stage, palette) => {
-            if matches!(
+            if super::moment_assets::draw(&mut p, kind, stage)? {
+                super::moments::effects(&mut p, kind, stage, phase);
+            } else if matches!(
                 kind,
                 crate::companion::world::Kind::Wand
                     | crate::companion::world::Kind::Ribbon

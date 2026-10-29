@@ -81,7 +81,9 @@ fn scene(
             center.1 - prop_size.1 as f32 / 2.,
         ),
     );
-    let activity = if matches!(kind, Kind::Ribbon | Kind::Wand) {
+    let activity = if kind == Kind::Brush {
+        Activity::Groom
+    } else if matches!(kind, Kind::Ribbon | Kind::Wand) {
         Activity::PawPlay
     } else {
         Activity::Watching
@@ -111,6 +113,17 @@ fn scene(
 pub(crate) fn gallery(folder: &Path) -> Result<(), String> {
     std::fs::create_dir_all(folder).map_err(|error| error.to_string())?;
     for (name, kind, code, phase, label) in [
+        ("brush", Kind::Brush, 0, 0., "Brush his head or ears"),
+        ("dandelion", Kind::Dandelion, 0, 0., "Offer near his nose"),
+        ("globe", Kind::SnowGlobe, 1, 2., "Drag to shake the globe"),
+        ("pond", Kind::Pond, 50, 0.5, "Drag the little boat"),
+        (
+            "keepsakes",
+            Kind::KeepsakeBox,
+            143,
+            0.,
+            "Click to open / close",
+        ),
         ("cups-watch", Kind::HideCups, 4, 1., "Watch the little star"),
         (
             "cups-guess",

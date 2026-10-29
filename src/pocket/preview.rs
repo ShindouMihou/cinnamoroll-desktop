@@ -10,6 +10,9 @@ pub fn gallery(folder: &Path) -> Result<(), String> {
     let settings = Settings::default();
     let mut typography = Typography::new()?;
     for (name, category) in [
+        ("moments", Category::Moments),
+        ("comfort", Category::Comfort),
+        ("study-tools", Category::StudyTools),
         ("home", Category::Home),
         ("play", Category::Play),
         ("cozy", Category::Cozy),

@@ -1,6 +1,6 @@
 pub(super) struct Drag {
     pub(super) offset: (f32, f32),
-    origin: (f32, f32),
+    pub(super) origin: (f32, f32),
     pub(super) moved: bool,
 }
 

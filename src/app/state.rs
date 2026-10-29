@@ -70,6 +70,10 @@ impl Pet {
             }
             self.position = self.bounds().clamp(self.position, self.size());
             if drag.moved {
+                self.companion.move_undo = Some(crate::companion::comfort::MoveSnapshot {
+                    pet: drag.origin,
+                    corner: self.settings.corner_position,
+                });
                 self.start(Activity::Land, now);
             } else if clicked && !self.brain.paused {
                 let size = self.size();
@@ -137,7 +141,17 @@ impl Pet {
         } else {
             self.position
         };
+        self.settings.extras.study_bookmark = self.companion.study.bookmark();
         self.settings.position = Some((position.0.round() as i32, position.1.round() as i32));
+        if let Some(home) = self.settings.corner_position
+            && let Some(display) = self
+                .monitors
+                .iter()
+                .find(|d| d.contains((home.0 as f32, home.1 as f32)))
+                .copied()
+        {
+            self.settings.extras.comfort.remember(display, home);
+        }
         let result = settings::save(&self.settings);
         if let Err(error) = &result {
             eprintln!("Could not save preferences: {error}");

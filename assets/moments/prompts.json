@@ -1,0 +1,7 @@
+{
+  "tool": "Built-in image_gen",
+  "prompt": "Six-prop transparent atlas, three columns by two rows: soft blue grooming brush, dandelion, cloud snow globe, cream pond tray with water and no boat, closed blue/pink plush keepsake box, matching open empty keepsake box. Fine warm outlines, cream/sky-blue/blush palette and soft detailed shading. Each prop fully inside its own cell with generous transparent gutters.",
+  "revision": "Restore complete brush handle and pond rim; shrink all six objects in their own cells to leave 20 percent transparent padding on all sides.",
+  "source": "source.png",
+  "prepare": "--prepare-moments assets/moments/source.png assets/moments/runtime"
+}

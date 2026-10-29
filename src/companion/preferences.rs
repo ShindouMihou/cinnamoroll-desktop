@@ -54,6 +54,10 @@ impl Default for StudyPreset {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Extras {
+    pub comfort: super::comfort::Preferences,
+    pub keepsakes: u8,
+    pub dream_bubbles: bool,
+    pub study_bookmark: Option<super::study::Bookmark>,
     pub presets: [StudyPreset; 3],
     pub task: String,
     pub task_done: bool,
@@ -70,6 +74,10 @@ pub struct Extras {
 impl Default for Extras {
     fn default() -> Self {
         Self {
+            comfort: super::comfort::Preferences::default(),
+            keepsakes: 0,
+            dream_bubbles: true,
+            study_bookmark: None,
             presets: [
                 StudyPreset::default(),
                 StudyPreset {
@@ -101,7 +109,13 @@ impl Default for Extras {
 
 impl Extras {
     pub fn validate(&self) -> bool {
-        (1..=60).contains(&self.item_interval_minutes)
+        self.comfort.valid()
+            && self
+                .study_bookmark
+                .as_ref()
+                .is_none_or(super::study::Bookmark::valid)
+            && self.keepsakes <= 15
+            && (1..=60).contains(&self.item_interval_minutes)
             && self.task.chars().count() <= 80
             && !self.task.chars().any(char::is_control)
             && self.palette.iter().all(|c| *c <= 0xffffff)

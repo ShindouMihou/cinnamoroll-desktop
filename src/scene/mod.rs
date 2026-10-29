@@ -1,5 +1,7 @@
 mod corner_drag;
 mod input;
+pub(crate) use input::InputPosition;
+pub(crate) mod moments_check;
 mod overlay;
 pub(crate) mod play_preview;
 pub(crate) mod preview;
@@ -34,8 +36,10 @@ pub(crate) struct Scene {
     corner: Option<Overlay>,
     item: Option<Overlay>,
     hint: Option<Overlay>,
+    dream: Option<Overlay>,
     corner_drag: Option<CornerDrag>,
     item_offset: (f32, f32),
+    pending_move: Option<crate::companion::comfort::MoveSnapshot>,
     settled_offset: Option<(f32, f32)>,
 }
 
@@ -46,8 +50,10 @@ impl Scene {
             corner: None,
             item: None,
             hint: None,
+            dream: None,
             corner_drag: None,
             item_offset: (0., 0.),
+            pending_move: None,
             settled_offset: None,
         }
     }
@@ -55,6 +61,7 @@ impl Scene {
         self.corner = None;
         self.item = None;
         self.hint = None;
+        self.dream = None;
         self.corner_drag = None;
         self.settled_offset = None;
     }
@@ -70,6 +77,7 @@ impl Scene {
         event.get_window_id().is_some_and(|id| {
             self.corner.as_ref().is_some_and(|w| id == w.id())
                 || self.item.as_ref().is_some_and(|w| id == w.id())
+                || self.dream.as_ref().is_some_and(|w| id == w.id())
                 || self.hint.as_ref().is_some_and(|w| id == w.id())
         })
     }
@@ -86,7 +94,11 @@ impl Scene {
         if let Some(drag) = self.corner_drag.as_mut()
             && let Some((home, pet)) = drag.motion(pointer, size, bounds)
         {
+            if let Some(snapshot) = self.pending_move.take() {
+                c.move_undo = Some(snapshot);
+            }
             s.corner_position = Some((home.0.round() as i32, home.1.round() as i32));
+            s.extras.comfort.preferred_display = Some(bounds);
             passenger = pet;
             if let Some(pet) = pet
                 && let Some(item) = c.item.as_mut()
@@ -99,13 +111,21 @@ impl Scene {
         if let Some(item) = c.item.as_mut()
             && item.held
         {
-            item.drag(
-                (
-                    pointer.0 - self.item_offset.0,
-                    pointer.1 - self.item_offset.1,
-                ),
-                now,
-            );
+            if item.kind == Kind::Pond {
+                let stage = (((pointer.0 - item.position.0) / (item.size().0 as f32 * 0.5) + 0.5)
+                    * 100.)
+                    .clamp(0., 100.) as u8;
+                item.velocity = (f32::from(stage) - f32::from(item.stage), 0.);
+                item.stage = stage;
+            } else {
+                item.drag(
+                    (
+                        pointer.0 - self.item_offset.0,
+                        pointer.1 - self.item_offset.1,
+                    ),
+                    now,
+                );
+            }
         }
         passenger
     }
@@ -124,9 +144,24 @@ impl Scene {
             self.corner = None;
             self.item = None;
             self.hint = None;
+            self.dream = None;
             self.corner_drag = None;
             self.settled_offset = None;
             return Ok(());
+        }
+        if let Some((_, kind)) = c.moments.dream {
+            if self.dream.is_none() {
+                self.dream = Some(Overlay::new(&self.video, "Cinnamoroll · A little dream")?);
+            }
+            let position = bounds.clamp((pet.0 + size.0 as f32 * 0.65, pet.1 - 62.), (80, 56));
+            self.dream.as_mut().ok_or("Missing dream window")?.show(
+                Decoration::Dream(kind),
+                (80, 56),
+                position,
+                0,
+            )?;
+        } else {
+            self.dream = None;
         }
         if s.cozy_corner {
             let home = corner_home(s.corner_position, pet, size, bounds);
@@ -200,13 +235,29 @@ impl Scene {
                     (Decoration::Cups(visual), item.kind.size(), 0)
                 }
                 kind => (
-                    Decoration::Prop(kind, item.stage, s.extras.palette),
-                    kind.size(),
-                    if (item.held || kind == Kind::Breathing)
-                        && matches!(kind, Kind::Wand | Kind::Ribbon | Kind::Breathing)
+                    Decoration::Prop(
+                        kind,
+                        if kind == Kind::KeepsakeBox {
+                            item.stage | s.extras.keepsakes
+                        } else {
+                            item.stage
+                        },
+                        s.extras.palette,
+                    ),
+                    item.size(),
+                    if ((item.held && matches!(kind, Kind::Wand | Kind::Ribbon | Kind::Pond))
+                        || kind == Kind::Breathing
+                        || (matches!(kind, Kind::Dandelion | Kind::SnowGlobe)
+                            && item.stage > 0
+                            && now - item.last_pop < 7.))
                         && !s.reduced_motion
                     {
-                        (now * 8.) as u64
+                        ((now - item.last_pop)
+                            .max(0.)
+                            .min(if kind == Kind::SnowGlobe { 6. } else { 120. })
+                            * 10.) as u64
+                    } else if kind == Kind::SnowGlobe && item.stage > 0 {
+                        60
                     } else {
                         0
                     },

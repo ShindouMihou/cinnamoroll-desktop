@@ -17,6 +17,7 @@ macro_rules! strip {
 }
 
 pub(super) const STRIPS: &[Strip] = &[
+    strip!(Groom, "groom"),
     strip!(PlaneReturn, "plane_return"),
     strip!(TeaSip, "tea_sip"),
     strip!(PlushHug, "plush_hug"),

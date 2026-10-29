@@ -4,6 +4,8 @@ mod attachment;
 mod cozy_corner;
 mod decorations;
 mod hint;
+mod moment_assets;
+mod moments;
 mod play_assets;
 mod playthings;
 pub(crate) mod stickers;
@@ -20,7 +22,9 @@ mod strips;
 pub(crate) mod walk_cycle;
 pub use mask::interaction_mask;
 mod prepare;
+mod prepare_moments;
 pub use prepare::{prepare as prepare_strips, prepare_bed, prepare_play_assets};
+pub use prepare_moments::prepare as prepare_moments;
 
 use crate::behavior::Activity;
 use shapes::Painter;

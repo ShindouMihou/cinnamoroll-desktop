@@ -75,6 +75,9 @@ pub(super) fn draw(
     p.pill([8., 8., 268., 76.], 16., [228, 244, 251], None);
     motifs::cloud(&mut p, 239., 56., [249, 253, 255]);
     let (title, subtitle) = match view.category {
+        Category::Moments => ("Little moments", "Small wonders, happy paws."),
+        Category::Comfort => ("Desktop comfort", "A little room for both of you."),
+        Category::StudyTools => ("Study your way", "Your place is saved automatically."),
         Category::Home => ("Little pocket", "What shall we do today?"),
         Category::Play => ("Play", "Tiny games, happy paws."),
         Category::Cozy => ("Cozy time", "Something soft, something sweet."),

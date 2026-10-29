@@ -53,6 +53,8 @@ jobs:
       - run: cargo +stable fmt --check
       - run: cargo +stable clippy --locked --all-targets --features bundled-sdl,updater -- -D warnings
       - run: cargo +stable test --locked --features bundled-sdl,updater
+      - name: Check native moment windows and interactions
+        run: cargo +stable run --locked --features bundled-sdl,updater -- --moments-check
       - run: python scripts/collect-licenses.py
       - if: runner.os == 'macOS'
         run: ./scripts/bundle-macos.sh

@@ -1,0 +1,6 @@
+{
+  "tool": "Built-in image_gen",
+  "reference": "assets/strips/runtime/petting.png",
+  "prompt": "Transparent eight-frame Cinnamoroll grooming response, four columns by two rows. Match existing petting strip identity, size, warm outline, cyan eyes and pink cheeks. Content relaxed pose, gentle left lean, deeper smiling lean, softly flattened ears, center, right lean, small happy ear shake, settle. Exactly two arms and two feet, no brush or props. Native strip preparation aligns each frame to the existing baseline.",
+  "runtime": "assets/strips/runtime/groom.png"
+}

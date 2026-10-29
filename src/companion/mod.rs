@@ -1,9 +1,12 @@
+pub mod comfort;
 pub mod corner;
 pub mod extras;
 pub mod games;
 pub mod homecoming;
+pub mod moments;
 pub mod placement;
 pub mod preferences;
+pub mod routing;
 pub mod study;
 pub mod touch;
 pub mod world;
@@ -15,6 +18,9 @@ use world::Item;
 
 #[derive(Default)]
 pub struct Companion {
+    pub route: routing::Route,
+    pub moments: moments::Moments,
+    pub move_undo: Option<comfort::MoveSnapshot>,
     pub homecoming: homecoming::Homecoming,
     pub study: Study,
     pub touch: Touch,
@@ -45,6 +51,7 @@ impl Companion {
             || self.chase_return.is_some()
     }
     pub fn clear_play(&mut self) {
+        self.route = Default::default();
         self.homecoming.reset();
         self.item = None;
         self.resting = false;

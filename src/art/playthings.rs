@@ -22,6 +22,12 @@ pub(super) fn draw(p: &mut Painter<'_>, kind: Kind, stage: u8, palette: [u32; 3]
     let purple = [219, 209, 246, 255];
     let brown = [174, 112, 61, 255];
     match kind {
+        Kind::Brush
+        | Kind::Dandelion
+        | Kind::SnowGlobe
+        | Kind::Pond
+        | Kind::KeepsakeBox
+        | Kind::ClearZone => super::moments::draw(p, kind, stage, phase),
         Kind::Breathing => {
             let radius = 24. + (phase * std::f32::consts::TAU / 6.4).sin() * 10.;
             oval(p, 80., 56., radius, radius, blue);

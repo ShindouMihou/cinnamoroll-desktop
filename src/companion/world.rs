@@ -2,6 +2,12 @@ use crate::geometry::Bounds;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Kind {
+    Brush,
+    Dandelion,
+    SnowGlobe,
+    Pond,
+    KeepsakeBox,
+    ClearZone,
     Ball,
     Treat,
     Bubbles,
@@ -59,6 +65,16 @@ impl Item {
             reaction_until: 0.,
             popped: 0,
             sample: None,
+        }
+    }
+    pub fn size(&self) -> (u32, u32) {
+        if self.kind == Kind::ClearZone {
+            (
+                160 + u32::from(self.stage.min(12)) * 40,
+                100 + u32::from(self.stage.min(12)) * 30,
+            )
+        } else {
+            self.kind.size()
         }
     }
     pub fn grab(&mut self, now: f64) {
@@ -135,6 +151,12 @@ impl Item {
             return Some(cups.hint());
         }
         match self.kind {
+            Kind::Brush => Some("Brush his head or ears"),
+            Kind::Dandelion => Some("Offer near his nose"),
+            Kind::SnowGlobe => Some("Drag to shake the globe"),
+            Kind::Pond => Some("Drag the little boat"),
+            Kind::KeepsakeBox => Some("Click to open / close"),
+            Kind::ClearZone => Some("Drag · scroll · right-click saves"),
             Kind::Bubbles => Some("Click a bubble to pop it"),
             Kind::Ball if !self.activated => Some("Drag and release to toss"),
             Kind::Plane if !self.activated => Some("Drag and release to launch"),
@@ -162,7 +184,7 @@ impl Item {
             return;
         }
         let dt = dt.clamp(0., 0.05);
-        let margin = self.kind.size();
+        let margin = self.size();
         let left = bounds.x as f32 + margin.0 as f32 / 2.;
         let right = (bounds.x as f32 + bounds.width as f32 - margin.0 as f32 / 2.).max(left);
         let top = bounds.y as f32 + margin.1 as f32 / 2.;
@@ -214,6 +236,8 @@ impl Item {
 impl Kind {
     pub fn size(self) -> (u32, u32) {
         match self {
+            Self::ClearZone => (240, 160),
+            Self::Pond => (144, 88),
             Self::Ball | Self::Treat => (36, 36),
             Self::Bubbles => (96, 80),
             Self::HideCups => (180, 96),

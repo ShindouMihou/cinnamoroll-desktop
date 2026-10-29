@@ -11,6 +11,9 @@ impl Pet {
         bounds: Bounds,
         size: (u32, u32),
     ) -> bool {
+        if self.advance_moment(now) {
+            return true;
+        }
         let Some(item) = self.companion.item.as_ref() else {
             return false;
         };

@@ -167,11 +167,7 @@ impl Panel {
                     && (17. ..43.).contains(y)
                     && self.category != Category::Home
                 {
-                    self.category = if self.category == Category::Presets {
-                        Category::Study
-                    } else {
-                        Category::Home
-                    };
+                    self.category = self.category.parent();
                     self.populate();
                     return (None, false);
                 }
@@ -201,11 +197,7 @@ impl Panel {
             } => match key {
                 Keycode::Escape => (None, true),
                 Keycode::Left | Keycode::Backspace => {
-                    self.category = if self.category == Category::Presets {
-                        Category::Study
-                    } else {
-                        Category::Home
-                    };
+                    self.category = self.category.parent();
                     self.populate();
                     (None, false)
                 }

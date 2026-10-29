@@ -25,6 +25,9 @@ impl Pet {
         }
         self.schedule_item(now);
         let kinds = [
+            Kind::Brush,
+            Kind::Dandelion,
+            Kind::SnowGlobe,
             Kind::Treat,
             Kind::Wand,
             Kind::Ribbon,
@@ -44,6 +47,18 @@ impl Pet {
         });
         let point =
             crate::companion::placement::item_center(kind, self.position, pet, self.bounds(), home);
+        let size = kind.size();
+        let Some(top_left) = self.settings.extras.comfort.placement(
+            (point.0 - size.0 as f32 / 2., point.1 - size.1 as f32 / 2.),
+            size,
+            self.bounds(),
+        ) else {
+            return;
+        };
+        let point = (
+            top_left.0 + size.0 as f32 / 2.,
+            top_left.1 + size.1 as f32 / 2.,
+        );
         let mut item = Item::new(kind, point, now);
         item.spontaneous = true;
         item.expires = now + 120.;

@@ -3,6 +3,12 @@ use crate::behavior::Activity;
 #[derive(Clone, Debug)]
 pub enum Command {
     Pocket,
+    StudyStopwatch,
+    StudyResume,
+    StudyDiscard,
+    UndoMove,
+    ClearZones,
+    DreamBubbles,
     SessionPlan,
     CreativeTools,
     UsePreset(usize),

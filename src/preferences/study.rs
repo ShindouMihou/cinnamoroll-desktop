@@ -27,7 +27,13 @@ impl Page<'_, '_> {
             "Session paused"
         } else {
             match view.phase {
-                Phase::Focus => "Focus time",
+                Phase::Focus => {
+                    if view.stopwatch {
+                        "Open-ended study · elapsed"
+                    } else {
+                        "Focus time"
+                    }
+                }
                 Phase::Break => "A little break",
                 Phase::Ready => "Ready for another session?",
                 Phase::Idle => "Ready when you are",
@@ -77,7 +83,11 @@ impl Page<'_, '_> {
             BLUE,
         );
         for (i, (label, command, enabled)) in [
-            ("Add five minutes", Command::StudyExtend, active),
+            (
+                "Add five minutes",
+                Command::StudyExtend,
+                active && !view.stopwatch,
+            ),
             ("Skip this phase", Command::StudySkip, active),
             ("End session", Command::StudyStop, view.phase != Phase::Idle),
         ]

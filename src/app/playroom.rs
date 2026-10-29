@@ -29,7 +29,25 @@ impl Pet {
                 item.landed = true;
                 item.velocity = (0., 0.);
             }
+            let previous = item.position;
             item.step(dt, bounds, stationary);
+            if !item.held && !item.carried {
+                let size = item.size();
+                let from = (
+                    previous.0 - size.0 as f32 / 2.,
+                    previous.1 - size.1 as f32 / 2.,
+                );
+                let to = (
+                    item.position.0 - size.0 as f32 / 2.,
+                    item.position.1 - size.1 as f32 / 2.,
+                );
+                let point = self.settings.extras.comfort.step(from, to, size);
+                if point != to {
+                    item.velocity = (0., 0.);
+                    item.landed = true;
+                }
+                item.position = (point.0 + size.0 as f32 / 2., point.1 + size.1 as f32 / 2.);
+            }
         }
         if let Some(item) = self.companion.item.as_ref() {
             if item.spontaneous && !item.activated && !item.held {

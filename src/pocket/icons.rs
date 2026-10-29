@@ -15,6 +15,9 @@ pub(super) fn entry(entry: &Entry, scale: f32) -> Result<Pixmap, String> {
     match &entry.action {
         Action::Page(category) => character(
             match category {
+                Category::Moments => Happy,
+                Category::Comfort => CozyNap,
+                Category::StudyTools => Read,
                 Category::Home => Wave,
                 Category::Play => PawPlay,
                 Category::Cozy => TeaSip,
@@ -86,6 +89,7 @@ pub(super) fn selected(entry: &Entry, settings: &crate::settings::Settings, paus
     match &entry.action {
         Action::Do(Command::Accessory(accessory)) => *accessory == settings.extras.accessory,
         Action::Do(Command::Season(season)) => *season == settings.extras.season,
+        Action::Do(Command::DreamBubbles) => settings.extras.dream_bubbles,
         Action::Do(Command::Pause) => paused,
         _ => false,
     }

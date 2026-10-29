@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Activity {
+    Groom,
     PlaneReturn,
     TeaSip,
     PlushHug,
@@ -63,7 +64,8 @@ pub enum Activity {
 }
 
 impl Activity {
-    pub const ALL: [Self; 56] = [
+    pub const ALL: [Self; 57] = [
+        Self::Groom,
         Self::PlaneReturn,
         Self::TeaSip,
         Self::PlushHug,
@@ -124,6 +126,7 @@ impl Activity {
 
     pub fn label(self) -> &'static str {
         match self {
+            Self::Groom => "Enjoying a gentle brush",
             Self::PlaneReturn => "Returning your paper plane",
             Self::TeaSip => "Sipping tea",
             Self::PlushHug => "Hugging a plush",
@@ -222,7 +225,7 @@ impl Activity {
             Self::Held => (f64::INFINITY, f64::INFINITY),
             Self::Land => (0.7, 0.7),
             Self::Happy => (2., 4.),
-            Self::Petting | Self::Shy => (3., 5.),
+            Self::Groom | Self::Petting | Self::Shy => (3., 5.),
             Self::Curious => (4., 6.),
             Self::Watching | Self::Waiting => (6., 10.),
             Self::Excited => (3., 4.),

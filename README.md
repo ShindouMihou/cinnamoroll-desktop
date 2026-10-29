@@ -24,9 +24,11 @@ Some days call for a study buddy. Some call for a tiny friend in a blanket.
 
 - **Pick him up.** Click for a reaction, stroke his head, boop his nose, or carry him around with his little hanging animation.
 - **Open his pocket.** Right-click for a small collection of things to do together: play, cozy time, study, creative moments, and dress-up.
-- **Settle in to study.** Focus and break timers, favorite study presets, one little task, and a quiet reading buddy.
+- **Settle in to study.** Focus and break timers, an open-ended stopwatch, favorite study presets, one little task, and a quiet reading buddy. Sessions return paused after restarting or sleeping.
 - **Make a cozy corner.** A plush cloud bed, blanket colors, sleepy moments, and a gentle walk home after he’s been away for a while. Drag the bed to carry both when he’s settled on it.
 - **Bring the toys to him.** Offer treats, roll a ball, pop bubbles, follow a little star through shuffled cups, or try the ribbon, toy wand, and paper plane.
+- **Share a little wonder.** Brush his ears, offer a dandelion, shake a cloud snow globe, guide a tiny paper boat, and collect a few keepsakes. Quiet naps can bring little tappable dreams.
+- **Leave room for your work.** Place keep-clear zones from his pocket, undo the last drag, and remember cozy nooks when a display reconnects.
 - **Let little moments happen.** Spaced-out idle activities, shy smiles, ear wiggles, dancing, seasonal surprises, and optional nearby treats to offer.
 - **Make him yours.** Bows, scarves, hats, little bags, palette play, and transparent sticker exports.
 - **Keep it comfortable.** Pet sizes, reduced motion, quiet-time controls, automatic sleep, and a clean native settings panel.
@@ -60,7 +62,7 @@ The Mac installer uses `/Applications`, with `~/Applications` as a fallback when
 
 Prefer a ZIP? Manual downloads work too.
 
-The first checkpoint is **v0.1.2**. Release downloads appear on the [Releases page](https://github.com/ShindouMihou/cinnamoroll-desktop/releases) once published.
+The latest feature update is **v0.2.0**. Downloads are available on the [Releases page](https://github.com/ShindouMihou/cinnamoroll-desktop/releases).
 
 | Your computer | What to download | Then… |
 | --- | --- | --- |
@@ -94,7 +96,7 @@ Keyboard shortcuts apply while Cinnamoroll, his bed, or the relevant control has
 
 **App settings** keeps startup and updates together. Automatic update checks and **Update while away** start on and can be switched off independently.
 
-Once a stable release is published, Cinnamoroll checks quietly at most once a day. You can check manually, download an update, and choose **Install & restart**. With **Update while away** enabled, he can download, install, and relaunch after **one hour without computer input**. Study sessions and open controls defer unattended installation; returning input before the final swap cancels that attempt.
+Cinnamoroll checks quietly at most once a day. You can check manually, download an update, and choose **Install & restart**. With **Update while away** enabled, he can download, install, and relaunch after **one hour without computer input**. Study sessions and open controls defer unattended installation; returning input before the final swap cancels that attempt.
 
 Every downloaded update must pass the embedded signing-key check. Updates replace the complete app folder so artwork, native libraries, and the executable stay together. A failed folder swap restores the previous copy, and settings stay in your user profile.
 

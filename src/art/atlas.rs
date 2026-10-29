@@ -34,6 +34,7 @@ pub fn cell(activity: Activity, phase: f32, facing: f32) -> Result<Pixmap, Strin
 fn frame_location(activity: Activity, phase: f32, facing: f32) -> (u32, u32) {
     let frame = |count: u32| ((phase.clamp(0., 0.9999) * count as f32) as u32).min(count - 1);
     match activity {
+        Activity::Groom => (5, 0),
         Activity::PlaneReturn
         | Activity::TeaSip
         | Activity::PlushHug

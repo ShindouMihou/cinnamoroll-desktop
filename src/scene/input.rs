@@ -1,5 +1,10 @@
 use super::*;
 
+pub(crate) struct InputPosition {
+    pub pointer: (f32, f32),
+    pub pet: (f32, f32),
+}
+
 impl Scene {
     pub fn handle(
         &mut self,
@@ -7,14 +12,32 @@ impl Scene {
         c: &mut Companion,
         s: &mut Settings,
         now: f64,
-        pointer: (f32, f32),
+        position: InputPosition,
         mouse: &MouseUtil,
     ) -> (Option<Activity>, bool) {
+        let InputPosition { pointer, pet } = position;
         if self
             .hint
             .as_ref()
             .is_some_and(|hint| event.get_window_id() == Some(hint.id()))
         {
+            return (None, false);
+        }
+        if self
+            .dream
+            .as_ref()
+            .is_some_and(|w| event.get_window_id() == Some(w.id()))
+        {
+            if matches!(
+                event,
+                Event::MouseButtonDown {
+                    mouse_btn: MouseButton::Left,
+                    ..
+                }
+            ) {
+                c.moments.dream = Some((now + 2., 3));
+                c.moments.next_dream = now + 180.;
+            }
             return (None, false);
         }
         let corner = self
@@ -32,6 +55,10 @@ impl Scene {
                     let Some(window) = self.corner.as_ref() else {
                         return (None, false);
                     };
+                    self.pending_move = Some(crate::companion::comfort::MoveSnapshot {
+                        pet,
+                        corner: s.corner_position,
+                    });
                     self.corner_drag = Some(CornerDrag::new(
                         pointer,
                         window.canvas.window().position(),
@@ -39,6 +66,11 @@ impl Scene {
                     ));
                     mouse.capture(true);
                 } else if let Some(item) = c.item.as_mut() {
+                    if item.kind == Kind::KeepsakeBox {
+                        item.stage ^= 128;
+                        item.expires = now + 120.;
+                        return (Some(Activity::GiftOpen), false);
+                    }
                     if item.kind == Kind::Breathing {
                         return (None, false);
                     }
@@ -86,9 +118,31 @@ impl Scene {
                     c.study.paused = c.study.active();
                     return (Some(Activity::CozyNap), false);
                 }
+                let saved =
+                    if let Some(item) = c.item.as_ref().filter(|i| i.kind == Kind::ClearZone) {
+                        let size = item.size();
+                        if s.extras.comfort.zones.len() < 8 {
+                            s.extras.comfort.zones.push(Bounds {
+                                x: (item.position.0 - size.0 as f32 / 2.).round() as i32,
+                                y: (item.position.1 - size.1 as f32 / 2.).round() as i32,
+                                width: size.0,
+                                height: size.1,
+                            });
+                        }
+                        true
+                    } else {
+                        false
+                    };
                 c.item = None;
                 c.sniff_since = None;
                 mouse.capture(false);
+                return (None, saved);
+            }
+            Event::MouseWheel { y, .. } => {
+                if let Some(item) = c.item.as_mut().filter(|i| i.kind == Kind::ClearZone) {
+                    item.stage =
+                        (i32::from(item.stage) + if *y > 0. { 1 } else { -1 }).clamp(0, 12) as u8;
+                }
             }
             Event::MouseButtonUp {
                 mouse_btn: MouseButton::Left,
@@ -96,6 +150,7 @@ impl Scene {
             } => {
                 mouse.capture(false);
                 if let Some(drag) = self.corner_drag.take() {
+                    self.pending_move = None;
                     let moved = drag.moved;
                     if !moved {
                         c.resting = true;

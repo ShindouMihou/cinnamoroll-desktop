@@ -17,6 +17,18 @@ pub(super) enum Category {
     Creative,
     Style,
     Seasons,
+    Moments,
+    Comfort,
+    StudyTools,
+}
+impl Category {
+    pub fn parent(self) -> Self {
+        match self {
+            Self::Presets | Self::StudyTools => Self::Study,
+            Self::Seasons => Self::Moments,
+            _ => Self::Home,
+        }
+    }
 }
 #[derive(Clone)]
 pub(super) enum Action {
@@ -42,11 +54,54 @@ pub(super) fn entries(
             ("Study together", Page(Category::Study)),
             ("Creative corner", Page(Category::Creative)),
             ("Dress up", Page(Category::Style)),
-            ("Seasonal moments", Page(Category::Seasons)),
+            ("Little moments", Page(Category::Moments)),
+            ("Desktop comfort", Page(Category::Comfort)),
             (
                 if paused { "Resume pet" } else { "Pause pet" },
                 Do(Command::Pause),
             ),
+        ],
+        Category::Moments => vec![
+            ("Gentle grooming", Do(Command::Prop(Kind::Brush))),
+            ("Dandelion puff", Do(Command::Prop(Kind::Dandelion))),
+            ("Snow globe", Do(Command::Prop(Kind::SnowGlobe))),
+            ("Paper-boat pond", Do(Command::Prop(Kind::Pond))),
+            ("Keepsake box", Do(Command::Prop(Kind::KeepsakeBox))),
+            ("Seasonal moments", Page(Category::Seasons)),
+        ],
+        Category::Comfort => vec![
+            ("Undo last move", Do(Command::UndoMove)),
+            (
+                "Place a keep-clear zone",
+                Do(Command::Prop(Kind::ClearZone)),
+            ),
+            ("Clear all keep-clear zones", Do(Command::ClearZones)),
+            (
+                if settings.extras.dream_bubbles {
+                    "Dream bubbles · on"
+                } else {
+                    "Dream bubbles · off"
+                },
+                Do(Command::DreamBubbles),
+            ),
+            ("Cozy corner here", Do(Command::CornerHere)),
+        ],
+        Category::StudyTools => vec![
+            ("Play break", Do(Command::ChooseBreak(BreakChoice::Play))),
+            ("Start open-ended study", Do(Command::StudyStopwatch)),
+            (
+                if study.paused {
+                    "Resume saved session"
+                } else {
+                    "Pause session"
+                },
+                Do(if study.paused {
+                    Command::StudyResume
+                } else {
+                    Command::StudyPause
+                }),
+            ),
+            ("End / discard session", Do(Command::StudyDiscard)),
         ],
         Category::Play => vec![
             ("Ball", Do(Command::ToyBall)),
@@ -92,6 +147,7 @@ pub(super) fn entries(
             ),
             ("Complete my task", Do(Command::TaskDone)),
             ("Choose session & goal", Do(Command::SessionPlan)),
+            ("Stopwatch & saved session", Page(Category::StudyTools)),
             (
                 "Stretch together",
                 Do(Command::ChooseBreak(BreakChoice::Stretch)),
@@ -101,7 +157,6 @@ pub(super) fn entries(
                 "Breathe together",
                 Do(Command::ChooseBreak(BreakChoice::Breathe)),
             ),
-            ("Play break", Do(Command::ChooseBreak(BreakChoice::Play))),
         ],
         Category::Creative => vec![
             ("Palette play", Do(Command::Prop(Kind::Palette))),
@@ -130,6 +185,18 @@ pub(super) fn entries(
             action,
         })
         .collect();
+    entries.retain(|entry| match entry.action {
+        Action::Do(Command::StudyResume | Command::StudyPause | Command::StudyDiscard)
+            if category == Category::StudyTools =>
+        {
+            matches!(
+                study.phase,
+                crate::companion::study::Phase::Focus | crate::companion::study::Phase::Break
+            )
+        }
+        Action::Do(Command::ClearZones) => !settings.extras.comfort.zones.is_empty(),
+        _ => true,
+    });
     if category == Category::Study {
         entries.insert(
             1,

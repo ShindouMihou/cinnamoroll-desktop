@@ -9,6 +9,9 @@ pub(super) fn execute(
     mouse: &sdl3::mouse::MouseUtil,
     tray: &Tray,
 ) -> Result<bool, String> {
+    if pet.drag.is_none() && pet.comfort_command(&command, now, window, tray) {
+        return Ok(false);
+    }
     if pet.drag.is_none() && pet.extra_command(&command, now, tray) {
         return Ok(false);
     }

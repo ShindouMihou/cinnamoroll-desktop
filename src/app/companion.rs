@@ -14,12 +14,16 @@ impl Pet {
     pub(super) fn quiet_busy(&self) -> bool {
         self.companion.busy()
     }
-    pub(super) fn update_study(&mut self, now: f64) {
-        if let Some(phase) =
-            self.companion
-                .study
-                .tick(now, self.brain.paused, self.settings.break_minutes)
-            && self.drag.is_none()
+    pub(super) fn update_study(&mut self, now: f64, suspended: bool) {
+        if suspended && self.companion.study.active() {
+            self.companion.study.paused = true;
+            self.dirty = true;
+        }
+        if let Some(phase) = self.companion.study.tick(
+            now,
+            self.brain.paused || suspended,
+            self.settings.break_minutes,
+        ) && self.drag.is_none()
             && !self.hidden
         {
             if phase == Phase::Break {
@@ -74,7 +78,30 @@ impl Pet {
                 None
             },
         );
-        self.companion.item = Some(Item::new(kind, point, now));
+        let prop_size = kind.size();
+        let Some(top_left) = self.settings.extras.comfort.placement(
+            (
+                point.0 - prop_size.0 as f32 / 2.,
+                point.1 - prop_size.1 as f32 / 2.,
+            ),
+            prop_size,
+            bounds,
+        ) else {
+            return;
+        };
+        let point = (
+            top_left.0 + prop_size.0 as f32 / 2.,
+            top_left.1 + prop_size.1 as f32 / 2.,
+        );
+        let mut item = Item::new(kind, point, now);
+        if kind == Kind::ClearZone {
+            item.stage = 2;
+            item.expires = f64::INFINITY;
+        }
+        if kind == Kind::Pond {
+            item.stage = 50;
+        }
+        self.companion.item = Some(item);
         self.companion.return_to = Some(if self.settings.cozy_corner {
             corner_home(self.settings.corner_position, self.position, size, bounds)
         } else {
@@ -83,6 +110,7 @@ impl Pet {
     }
     pub(super) fn corner_here(&mut self) {
         self.settings.cozy_corner = true;
+        self.settings.extras.comfort.preferred_display = Some(self.bounds());
         let home = corner_home(None, self.position, self.size(), self.bounds());
         self.settings.corner_position = Some((home.0.round() as i32, home.1.round() as i32));
     }
@@ -94,6 +122,14 @@ impl Pet {
         window: &mut Window,
         stationary: bool,
     ) -> bool {
+        let Some(target) =
+            self.settings
+                .extras
+                .comfort
+                .placement(target, self.size(), self.bounds())
+        else {
+            return true;
+        };
         let distance = (target.0 - self.position.0).hypot(target.1 - self.position.1);
         if distance < 6. {
             return true;
@@ -101,7 +137,24 @@ impl Pet {
         if stationary {
             return false;
         }
-        let next = crate::play::approach(self.position, target, dt);
+        let size = self.size();
+        let display = self.bounds();
+        let waypoint = self.companion.route.next(
+            &self.settings.extras.comfort,
+            self.position,
+            target,
+            size,
+            display,
+        );
+        if waypoint == self.position {
+            return true;
+        }
+        let next = crate::play::approach(self.position, waypoint, dt);
+        let next = self
+            .settings
+            .extras
+            .comfort
+            .step(self.position, next, self.size());
         if (next.0 - self.position.0).abs() > 0.1 {
             self.brain.facing = (next.0 - self.position.0).signum();
         }

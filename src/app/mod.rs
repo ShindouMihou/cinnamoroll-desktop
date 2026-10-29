@@ -1,6 +1,7 @@
 mod attention;
 mod catch;
 mod chase;
+mod comforts;
 mod companion;
 mod companion_control;
 mod control;
@@ -9,6 +10,7 @@ mod edge;
 mod extra_control;
 mod extra_items;
 mod input;
+mod moments;
 mod play;
 mod playroom;
 mod signals;
@@ -74,6 +76,9 @@ pub fn run() -> Result<(), String> {
     if let Some(result) = crate::updates::apply(&arguments) {
         return result;
     }
+    if arguments.iter().any(|arg| arg == "--moments-check") {
+        return crate::scene::moments_check::run();
+    }
     if let Some(index) = arguments.iter().position(|arg| arg == "--play-gallery") {
         return crate::scene::play_preview::gallery(std::path::Path::new(
             arguments
@@ -102,6 +107,12 @@ pub fn run() -> Result<(), String> {
         .any(|argument| argument == "--stacking-check")
     {
         return native::stacking::smoke();
+    }
+    if let Some(index) = arguments.iter().position(|arg| arg == "--prepare-moments") {
+        return art::prepare_moments(
+            std::path::Path::new(arguments.get(index + 1).ok_or("Missing prop source")?),
+            std::path::Path::new(arguments.get(index + 2).ok_or("Missing prop output")?),
+        );
     }
     if let Some(index) = arguments.iter().position(|arg| arg == "--prepare-strips") {
         return art::prepare_strips(
@@ -225,6 +236,12 @@ pub fn run() -> Result<(), String> {
     };
     if pet.settings.position.is_none() || !pet.monitors.iter().any(|b| b.contains(pet.position)) {
         pet.home();
+    }
+    if let Some(bookmark) = pet.settings.extras.study_bookmark.as_ref() {
+        pet.companion.study.restore(bookmark, 0.);
+    }
+    if pet.settings.cozy_corner {
+        pet.restore_nook();
     }
     pet.position = pet.bounds().clamp(pet.position, pet.size());
     let size = pet.size();
@@ -382,7 +399,10 @@ pub fn run() -> Result<(), String> {
                     &mut pet.companion,
                     &mut pet.settings,
                     now,
-                    native::mouse_position(),
+                    crate::scene::InputPosition {
+                        pointer: native::mouse_position(),
+                        pet: pet.position,
+                    },
                     &sdl.mouse(),
                 );
                 if let Some(activity) = reaction
@@ -515,7 +535,13 @@ pub fn run() -> Result<(), String> {
             tray.sync(&pet.settings, pet.brain.paused, pet.hidden);
             last_frame = None;
         }
-        pet.update_study(now);
+        pet.update_study(now, dt > 15.);
+        pet.update_moments(now, low_battery);
+        if pet.companion.study.active()
+            && (now as u64 / 15) != ((now - f64::from(dt)).max(0.) as u64 / 15)
+        {
+            pet.dirty = true;
+        }
         let capture = pet.drag.is_some()
             || scene.dragging_corner()
             || pet.companion.item.as_ref().is_some_and(|item| item.held);
@@ -548,7 +574,11 @@ pub fn run() -> Result<(), String> {
             if let Ok(monitors) = native::displays(&video)
                 && !monitors.is_empty()
             {
+                let changed = pet.monitors != monitors;
                 pet.monitors = monitors;
+                if changed {
+                    pet.restore_nook();
+                }
                 if pet.drag.is_none() && !matches!(pet.play.mode, crate::play::Mode::EdgePeek(_)) {
                     pet.position = pet.bounds().clamp(pet.position, pet.size());
                     pet.place(canvas.window_mut());
@@ -590,7 +620,22 @@ pub fn run() -> Result<(), String> {
             if pocket.is_some() {
                 pet.hold_for_menu(f64::from(dt));
             } else {
+                let previous = pet.position;
                 pet.advance(now, dt, canvas.window_mut(), low_battery);
+                let allowed = pet
+                    .settings
+                    .extras
+                    .comfort
+                    .step(previous, pet.position, pet.size());
+                if allowed != pet.position {
+                    pet.position = allowed;
+                    pet.place(canvas.window_mut());
+                    if pet.play.mode.is_chasing() {
+                        pet.finish_chase(now);
+                    } else if pet.brain.activity.moves() {
+                        pet.start(Activity::Idle, now);
+                    }
+                }
             }
         }
         if pet.brain.activity != last_activity {
