@@ -68,3 +68,11 @@ The tag must be `vVERSION`, using a stable semantic version newer than the insta
 Confirm all three platform jobs passed and the draft has every expected asset. Install the portable packages on their intended computers and exercise dragging, settings, the pocket, media reactions, and startup registration. Validate a real update and relaunch between two versions before depending on unattended updates. OS-signing/notarization remains separate from archive signing.
 
 Publish the reviewed draft only with explicit approval. Drafts and prereleases are not offered to the stable updater. If no stable release exists yet, the app shows that the first release is being prepared.
+
+## One-line installers
+
+`install.sh` and `install.ps1` select only the latest published stable release. They verify the exact asset’s SHA-256 against SHA256SUMS, reject unsafe archive paths, confirm the extracted app’s version, and stage replacement beside the destination. Failed replacement restores the previous app. Preferences are not stored in that folder and remain unchanged.
+
+Windows defaults to `%LOCALAPPDATA%\Programs\Cinnamoroll` so installations and idle updates work without UAC, and adds a per-user Start Menu shortcut. Mac defaults to `/Applications`, falling back to `~/Applications` if the system folder is not writable. A running copy in the target location must be closed before reinstalling. Startup registration remains an explicit app setting on fresh installations.
+
+Offline test options take a local archive, checksums file, and explicit version. Use `--no-launch` on Mac or `-NoLaunch -NoShortcuts` on Windows for isolated installation checks. The checksum protects the initial download’s integrity; HTTPS GitHub hosting is the bootstrap trust source, and subsequent app updates additionally require the embedded Ed25519 signature.

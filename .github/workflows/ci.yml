@@ -26,6 +26,7 @@ jobs:
           Get-ChildItem target/debug/build -Recurse -Filter SDL3.dll |
             ForEach-Object { $_.DirectoryName } | Select-Object -Unique |
             ForEach-Object { Add-Content $env:GITHUB_PATH $_ }
+      - run: python -m unittest discover -s scripts -p test_release_packaging.py
       - run: cargo +stable fmt --check
       - run: cargo +stable clippy --locked --all-targets --features bundled-sdl,updater -- -D warnings
       - run: cargo +stable test --locked --features bundled-sdl,updater

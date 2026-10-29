@@ -16,8 +16,8 @@ TARGETS = {'aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-pc-windows'}
 
 def source_archive(output: Path, version: str) -> Path:
     archive = output / f'Cinnamoroll-{version}-source.zip'
-    roots = ['Cargo.toml', 'Cargo.lock', 'build.rs', '.gitignore', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'src', 'assets', 'scripts', 'packaging', 'docs', '.github']
-    with zipfile.ZipFile(archive, 'x', zipfile.ZIP_DEFLATED, compresslevel=6) as package:
+    roots = ['Cargo.toml', 'Cargo.lock', 'build.rs', '.gitignore', 'README.md', 'install.sh', 'install.ps1', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'src', 'assets', 'scripts', 'packaging', 'docs', '.github', '.cargo']
+    with zipfile.ZipFile(archive, 'x', zipfile.ZIP_DEFLATED, compresslevel=6, strict_timestamps=False) as package:
         for name in roots:
             root = ROOT / name
             files = [root] if root.is_file() else sorted(root.rglob('*'))
@@ -71,7 +71,7 @@ def main() -> None:
         subprocess.run(['/usr/bin/codesign', '--verify', '--deep', '--strict', str(root)], check=True)
         subprocess.run(['/usr/bin/ditto', '-c', '-k', '--sequesterRsrc', '--keepParent', str(root), str(archive)], check=True)
     else:
-        with zipfile.ZipFile(archive, 'x', zipfile.ZIP_DEFLATED, compresslevel=6) as package:
+        with zipfile.ZipFile(archive, 'x', zipfile.ZIP_DEFLATED, compresslevel=6, strict_timestamps=False) as package:
             for path in sorted(root.rglob('*')):
                 if path.is_file():
                     package.write(path, Path(root.name) / path.relative_to(root))

@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing release tag, such as v0.1.0
+        description: Existing release tag, such as v0.1.1
         required: true
         type: string
 permissions:
@@ -49,6 +49,7 @@ jobs:
           Get-ChildItem target/debug/build -Recurse -Filter SDL3.dll |
             ForEach-Object { $_.DirectoryName } | Select-Object -Unique |
             ForEach-Object { Add-Content $env:GITHUB_PATH $_ }
+      - run: python -m unittest discover -s scripts -p test_release_packaging.py
       - run: cargo +stable fmt --check
       - run: cargo +stable clippy --locked --all-targets --features bundled-sdl,updater -- -D warnings
       - run: cargo +stable test --locked --features bundled-sdl,updater
@@ -81,6 +82,15 @@ jobs:
           import os, subprocess
           from pathlib import Path
           subprocess.run(['python', 'scripts/prepare-release.py', '--target', os.environ['RELEASE_TARGET'], '--key', str(Path(os.environ['RUNNER_TEMP']) / 'cinnamoroll-signing.key')], check=True)
+      - name: Check the Mac one-line installer
+        if: runner.os == 'macOS'
+        run: ./scripts/test-installers.sh "dist/releases/Cinnamoroll-$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -1)-${RELEASE_TARGET}.zip"
+      - name: Check the Windows one-line installer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $Archive = Get-ChildItem dist/releases/*-x86_64-pc-windows.zip | Select-Object -First 1
+          ./scripts/test-installers.ps1 -ArchivePath $Archive.FullName
       - name: Remove the temporary signing file
         if: always()
         shell: python

@@ -12,6 +12,16 @@ try {
         Sort-Object LastWriteTime -Descending | Select-Object -First 1
     if (-not $Library) { throw 'SDL3.dll was not found in the bundled build' }
     Copy-Item $Library.FullName $Destination
+    $VsWhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+    $Dumpbin = & $VsWhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find 'VC\Tools\MSVC\**\bin\Hostx64\x64\dumpbin.exe' | Select-Object -First 1
+    if (-not $Dumpbin) { throw 'Cannot inspect native runtime dependencies; Visual Studio C++ Build Tools are required.' }
+    foreach ($Binary in @((Join-Path $Destination 'Cinnamoroll.exe'), (Join-Path $Destination 'SDL3.dll'))) {
+        $Imports = & $Dumpbin /dependents $Binary
+        if ($LASTEXITCODE -ne 0) { throw 'Could not inspect the packaged executable or SDL library.' }
+        if ($Imports -match '(?i)\b(vcruntime|msvcp|msvcr)[0-9][a-z0-9_]*\.dll\b') {
+            throw 'A packaged file needs a separate Visual C++ runtime. Build with the repository static-CRT configuration.'
+        }
+    }
     Copy-Item README.md, LICENSE, THIRD_PARTY_NOTICES.md $Destination
     Copy-Item -Recurse -Force docs $Destination
     Copy-Item packaging/Windows-Readme.txt (Join-Path $Destination 'Read-me-first.txt')

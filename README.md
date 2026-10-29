@@ -42,7 +42,25 @@ He can also listen along with supported music players and browser media sessions
 
 ## Bring him home
 
-The first checkpoint is **v0.1.0**. Release downloads appear on the [Releases page](https://github.com/ShindouMihou/cinnamoroll-desktop/releases) once published.
+Install the latest published release with one line:
+
+**macOS**
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/ShindouMihou/cinnamoroll-desktop/main/install.sh | sh
+```
+
+**Windows PowerShell**
+
+```powershell
+irm https://raw.githubusercontent.com/ShindouMihou/cinnamoroll-desktop/main/install.ps1 | iex
+```
+
+The Mac installer uses `/Applications`, with `~/Applications` as a fallback when needed. Windows uses `%LOCALAPPDATA%\Programs\Cinnamoroll` and adds a Start Menu shortcut. Both verify published release checksums, preserve preferences, and keep the installation writable for silent updates. No administrator prompt is needed for the default Windows location. [Installer source](install.ps1) · [Mac installer source](install.sh).
+
+Prefer a ZIP? Manual downloads work too.
+
+The first checkpoint is **v0.1.1**. Release downloads appear on the [Releases page](https://github.com/ShindouMihou/cinnamoroll-desktop/releases) once published.
 
 | Your computer | What to download | Then… |
 | --- | --- | --- |

@@ -1,6 +1,6 @@
 # Development
 
-The desktop companion is a native Rust/SDL3 application. Use Rust 1.89 or later, a C/C++ toolchain, and CMake for bundled SDL builds.
+The desktop companion is a native Rust/SDL3 application. The standalone installers use only each operating system’s built-in tools. Use Rust 1.89 or later, a C/C++ toolchain, and CMake for bundled SDL builds.
 
 ## Run locally
 
