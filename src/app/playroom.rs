@@ -17,6 +17,9 @@ impl Pet {
             .as_ref()
             .is_some_and(|item| now >= item.expires)
         {
+            if let Some(visit) = self.companion.cozy_return.as_mut() {
+                visit.due = now;
+            }
             self.companion.item = None;
             self.companion.sniff_since = None;
             self.companion.return_to = None;

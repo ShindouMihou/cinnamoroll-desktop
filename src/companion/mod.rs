@@ -6,7 +6,9 @@ pub mod homecoming;
 pub mod moments;
 pub mod placement;
 pub mod preferences;
+pub mod routine;
 pub mod routing;
+pub mod social;
 pub mod study;
 pub mod touch;
 pub mod world;
@@ -18,6 +20,9 @@ use world::Item;
 
 #[derive(Default)]
 pub struct Companion {
+    pub paw_offer: Option<social::PawOffer>,
+    pub cozy_return: Option<social::CozyReturn>,
+    pub routine: routine::Routine,
     pub route: routing::Route,
     pub moments: moments::Moments,
     pub move_undo: Option<comfort::MoveSnapshot>,
@@ -26,6 +31,7 @@ pub struct Companion {
     pub touch: Touch,
     pub item: Option<Item>,
     pub resting: bool,
+    pub recovery_until: Option<f64>,
     pub tucked: bool,
     pub dance_taps: Vec<f64>,
     pub dance_rate: f64,
@@ -44,17 +50,22 @@ impl Companion {
             .is_some_and(|item| !item.spontaneous || item.activated || item.held)
     }
     pub fn busy(&self) -> bool {
-        self.study.active()
+        self.paw_offer.is_some()
+            || self.cozy_return.is_some()
+            || self.study.active()
             || self.active_item()
             || self.resting
             || self.after_action.is_some()
             || self.chase_return.is_some()
     }
     pub fn clear_play(&mut self) {
+        self.paw_offer = None;
+        self.cozy_return = None;
         self.route = Default::default();
         self.homecoming.reset();
         self.item = None;
         self.resting = false;
+        self.recovery_until = None;
         self.tucked = false;
         self.sniff_since = None;
         self.return_to = None;

@@ -115,7 +115,7 @@ impl Page<'_, '_> {
         self.toggle(
             476.,
             "Quiet surprises",
-            "Tiny moments with several minutes of quiet between.",
+            "Tea, reading & play, with 2–4 minute quiet breaks.",
             s.extras.ambient_surprises,
             Command::Surprises,
         );

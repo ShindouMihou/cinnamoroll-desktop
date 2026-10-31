@@ -25,6 +25,7 @@ impl Pet {
         }
         self.schedule_item(now);
         let kinds = [
+            Kind::Ball,
             Kind::Brush,
             Kind::Dandelion,
             Kind::SnowGlobe,
@@ -63,6 +64,7 @@ impl Pet {
         item.spontaneous = true;
         item.expires = now + 120.;
         self.companion.item = Some(item);
+        self.start(Activity::Wave, now);
     }
 
     fn schedule_item(&mut self, now: f64) {

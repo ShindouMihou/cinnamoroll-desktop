@@ -100,7 +100,7 @@ impl Default for Extras {
             accessory: Accessory::None,
             season: Season::None,
             ambient_surprises: true,
-            surprise_items: false,
+            surprise_items: true,
             item_interval_minutes: 8,
             last_gift_day: None,
         }
@@ -148,5 +148,23 @@ mod tests {
         s.presets[0].name = "Biology".into();
         s.palette[0] = 0x1000000;
         assert!(!s.validate());
+    }
+}
+
+#[cfg(test)]
+mod surprise_defaults_tests {
+    use super::*;
+    #[test]
+    fn surprises_default_on_without_overriding_a_saved_opt_out() {
+        assert!(Extras::default().surprise_items);
+        let missing: Extras = serde_json::from_str("{}").unwrap();
+        assert!(missing.surprise_items);
+        let opted_out: Extras = serde_json::from_str(r#"{"surprise_items":false}"#).unwrap();
+        assert!(!opted_out.surprise_items);
+        assert!(
+            !serde_json::from_str::<Extras>(&serde_json::to_string(&opted_out).unwrap())
+                .unwrap()
+                .surprise_items
+        );
     }
 }

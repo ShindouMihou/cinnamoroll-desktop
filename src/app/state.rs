@@ -108,11 +108,20 @@ impl Pet {
             return;
         }
         self.companion.homecoming.hold(elapsed);
+        if let Some(offer) = self.companion.paw_offer.as_mut() {
+            offer.hold(elapsed);
+        }
+        if let Some(visit) = self.companion.cozy_return.as_mut() {
+            visit.due += elapsed;
+        }
         self.brain.started += elapsed;
         self.brain.until += elapsed;
         self.play.resume(elapsed);
         self.companion.next_surprise += elapsed;
         self.companion.next_item += elapsed;
+        if let Some(until) = self.companion.recovery_until.as_mut() {
+            *until += elapsed;
+        }
         if let Some(due) = self.companion.chase_return.as_mut() {
             *due += elapsed;
         }

@@ -13,7 +13,9 @@ mod input;
 mod moments;
 mod play;
 mod playroom;
+mod routine_check;
 mod signals;
+mod social;
 mod state;
 mod surprise_items;
 mod toy_games;
@@ -76,8 +78,18 @@ pub fn run() -> Result<(), String> {
     if let Some(result) = crate::updates::apply(&arguments) {
         return result;
     }
+    if arguments.iter().any(|arg| arg == "--routine-check") {
+        return routine_check::run();
+    }
     if arguments.iter().any(|arg| arg == "--moments-check") {
         return crate::scene::moments_check::run();
+    }
+    if let Some(index) = arguments.iter().position(|arg| arg == "--social-gallery") {
+        return crate::scene::preview::social(std::path::Path::new(
+            arguments
+                .get(index + 1)
+                .ok_or("Missing social preview folder")?,
+        ));
     }
     if let Some(index) = arguments.iter().position(|arg| arg == "--play-gallery") {
         return crate::scene::play_preview::gallery(std::path::Path::new(
@@ -560,16 +572,15 @@ pub fn run() -> Result<(), String> {
                     && pocket.is_none()
                     && panel.is_none(),
             );
-            let woke = pet.idle_sleep(idle, now);
+            pet.idle_sleep(idle, now);
             pet.attend_to_activity(idle, now);
             if away.update(idle)
-                && !woke
                 && !pet.brain.paused
                 && pet.drag.is_none()
                 && !pet.play.busy()
                 && !pet.quiet_busy()
             {
-                pet.start(Activity::Greet, now);
+                pet.welcome_back(now, low_battery);
             }
             if let Ok(monitors) = native::displays(&video)
                 && !monitors.is_empty()
@@ -588,6 +599,7 @@ pub fn run() -> Result<(), String> {
         }
         if last_attention_check.elapsed() >= Duration::from_millis(200) {
             if !scene.dragging_corner() && pocket.is_none() {
+                pet.respond_to_paw(native::mouse_position(), now, low_battery);
                 pet.touch_pointer(now);
                 pet.attend_to_pointer(now);
                 pet.maybe_chase(now, low_battery);
@@ -755,7 +767,9 @@ pub fn run() -> Result<(), String> {
             }
             last_frame = None;
         }
-        let elapsed = if pet.brain.activity == Activity::Walk {
+        let elapsed = if pet.companion.paw_offer.is_some() {
+            (pet.paused_at.unwrap_or(now) - pet.brain.started).clamp(0., 0.4)
+        } else if pet.brain.activity == Activity::Walk {
             walk_elapsed
         } else {
             (pet.paused_at.unwrap_or(now) - pet.brain.started)

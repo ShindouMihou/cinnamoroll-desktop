@@ -153,10 +153,11 @@ impl Scene {
             if self.dream.is_none() {
                 self.dream = Some(Overlay::new(&self.video, "Cinnamoroll · A little dream")?);
             }
-            let position = bounds.clamp((pet.0 + size.0 as f32 * 0.65, pet.1 - 62.), (80, 56));
+            let (bubble_size, position) =
+                crate::companion::placement::dream_layout(pet, size, bounds);
             self.dream.as_mut().ok_or("Missing dream window")?.show(
                 Decoration::Dream(kind),
-                (80, 56),
+                bubble_size,
                 position,
                 0,
             )?;
@@ -196,7 +197,11 @@ impl Scene {
             self.corner_drag = None;
             self.settled_offset = None;
         }
-        if let Some(item) = &c.item {
+        if let Some(item) = c.item.as_ref().filter(|item| {
+            !(item.kind == Kind::Plush
+                && item.carried
+                && c.cozy_return.is_some_and(|visit| now < visit.due))
+        }) {
             let (kind, logical, tick) = match item.kind {
                 Kind::Ball => (
                     Decoration::Ball,
@@ -302,7 +307,26 @@ impl Scene {
             }
         } else {
             self.item = None;
-            self.hint = None;
+            if c.paw_offer.is_some() {
+                let position = bounds.clamp(
+                    (
+                        pet.0 + size.0 as f32 * 0.5 - 90.,
+                        pet.1 + size.1 as f32 + 4.,
+                    ),
+                    (180, 24),
+                );
+                if self.hint.is_none() {
+                    self.hint = Some(Overlay::new(&self.video, "Cinnamoroll · Paw invitation")?);
+                }
+                self.hint.as_mut().ok_or("Missing paw hint")?.show(
+                    Decoration::Hint("Hold near my raised paw"),
+                    (180, 24),
+                    position,
+                    0,
+                )?;
+            } else {
+                self.hint = None;
+            }
         }
         Ok(())
     }

@@ -1,81 +1,111 @@
 use super::{
     layout::{Action, LEFT, Page, RIGHT},
-    paint::{INK, MUTED, SOFT},
+    paint::{BORDER, INK, MUTED, SOFT},
     status::activity_name,
 };
 use crate::{behavior::Activity, command::Command, settings::Settings};
 
 impl Page<'_, '_> {
     pub(super) fn playroom(&mut self, s: &Settings) {
-        self.section(118., "Toys & treats");
-        self.button(
-            [548., 109., 148., 30.],
-            "Surprise items",
-            Action::Tab(10),
-            false,
-            true,
-        );
-        self.note(
-            146.,
-            "Drag a treat near him, toss a ball, or click the bubbles.",
-        );
-        for (i, (label, command)) in [
+        self.painter
+            .pill([LEFT, 112., 244., 250.], 12., [255; 3], Some(BORDER));
+        self.painter
+            .pill([448., 112., 248., 250.], 12., [255; 3], Some(BORDER));
+        self.painter.text("Toys & treats", 208., 128., 15., INK);
+        self.painter
+            .text("Bring a little something to him.", 208., 152., 11., MUTED);
+        for (index, (label, command)) in [
             ("Offer a treat", Command::OfferTreat),
             ("Take out a ball", Command::ToyBall),
-            ("Bubbles", Command::ToyBubbles),
+            ("Pop bubbles", Command::ToyBubbles),
         ]
         .into_iter()
         .enumerate()
         {
             self.button(
-                Self::cell(i, 179., 3),
+                [208., 180. + index as f32 * 42., 212., 34.],
                 label,
                 Action::Command(command),
                 false,
                 true,
             );
         }
+        self.painter.pill([208., 314., 212., 1.], 0., BORDER, None);
         self.button(
-            [192., 225., 234., 30.],
-            "Put toys & treats away",
+            [208., 325., 212., 24.],
+            "Tidy toys & treats",
             Action::Command(Command::PutAway),
             false,
             true,
         );
-        self.divider(281.);
-        self.section(305., "Touch & affection");
-        for (i, (label, activity)) in [
+
+        self.painter.text("Touch & affection", 464., 128., 15., INK);
+        self.painter
+            .text("A little affection, anytime.", 464., 152., 11., MUTED);
+        for (index, (label, activity)) in [
+            ("Head pats", Activity::Petting),
+            ("Cheek rub", Activity::CheekRub),
             ("High five", Activity::HighFive),
+            ("Nose boop", Activity::Boop),
             ("Tickle", Activity::Tickle),
             ("Nuzzle", Activity::Nuzzle),
-            ("Cheek rub", Activity::CheekRub),
-            ("Nose boop", Activity::Boop),
-            ("Head pats", Activity::Petting),
         ]
         .into_iter()
         .enumerate()
         {
             self.button(
-                Self::cell(i, 340., 3),
+                [
+                    464. + (index % 2) as f32 * 114.,
+                    180. + (index / 2) as f32 * 42.,
+                    102.,
+                    34.,
+                ],
                 label,
                 Action::Command(Command::Activity(activity)),
                 false,
                 true,
             );
         }
-        self.toggle(
-            442.,
-            "Touch reactions",
-            "React to gentle pointer gestures.",
-            s.touch_enabled,
-            Command::TouchEnabled,
-        );
+        self.painter
+            .text("Or pet him directly on screen.", 464., 331., 11., MUTED);
+
+        self.painter.pill([LEFT, 382., 504., 66.], 12., SOFT, None);
+        self.painter.text("Surprise items", 208., 396., 14., INK);
         self.painter.text(
-            "Rub cheeks or tummy; hold at a paw or nose.",
-            192.,
-            507.,
+            &if s.extras.surprise_items {
+                format!("On · About every {} min", s.extras.item_interval_minutes)
+            } else {
+                "Off · Only take out toys yourself".into()
+            },
+            208.,
+            420.,
             11.,
             MUTED,
+        );
+        self.button(
+            [564., 399., 116., 32.],
+            "Manage",
+            Action::Tab(10),
+            false,
+            true,
+        );
+
+        self.painter
+            .pill([LEFT, 462., 504., 64.], 12., [255; 3], Some(BORDER));
+        self.painter.text("Touch reactions", 208., 476., 14., INK);
+        self.painter.text(
+            "React when you stroke his head, cheeks, or tummy.",
+            208.,
+            500.,
+            11.,
+            MUTED,
+        );
+        self.button(
+            [616., 478., 64., 32.],
+            if s.touch_enabled { "On" } else { "Off" },
+            Action::Command(Command::TouchEnabled),
+            s.touch_enabled,
+            true,
         );
     }
     pub(super) fn animations(&mut self, s: &Settings, paused: bool, activity: Activity) {

@@ -236,7 +236,7 @@ fn ambient_moments_wait_for_quiet_idle_and_never_interrupt_focus_or_manual_naps(
     assert_eq!(pet.companion.next_surprise, 1.);
     pet.settings.reduced_motion = false;
     pet.maybe_surprise(100., false);
-    assert!(pet.companion.next_surprise >= 580.);
+    assert!((220. ..=340.).contains(&pet.companion.next_surprise));
     let deadline = pet.companion.next_surprise;
     pet.maybe_surprise(101., false);
     assert_eq!(pet.companion.next_surprise, deadline);
@@ -292,7 +292,7 @@ fn surprise_items_wait_for_an_offer_and_respect_focus_and_existing_toys() {
     assert!(item.spontaneous);
     assert!(!item.activated);
     assert!(!pet.quiet_busy());
-    assert_eq!(pet.brain.activity, Activity::Idle);
+    assert_eq!(pet.brain.activity, Activity::Wave);
     let expires = item.expires;
     pet.companion.next_item = 1.;
     pet.maybe_item(40., false);
@@ -469,4 +469,128 @@ fn sleep_pauses_study_and_reconnecting_a_display_restores_its_nook() {
     p.restore_nook();
     assert_eq!(p.settings.corner_position, Some((-900, 500)));
     assert_eq!(p.position, (-900., 500.));
+}
+
+#[test]
+fn recovery_rest_expires_but_real_idle_sleep_waits_for_input() {
+    let mut p = pet();
+    p.companion.resting = true;
+    p.companion.recovery_until = Some(45.);
+    p.play.mode = Mode::Sleeping;
+    assert!(!p.idle_sleep(Some(0.), 44.));
+    assert!(p.idle_sleep(Some(0.), 45.));
+    assert!(!p.companion.busy());
+    assert_eq!(p.play.mode, Mode::Normal);
+    p.companion.resting = true;
+    p.companion.recovery_until = Some(90.);
+    p.play.mode = Mode::Sleeping;
+    assert!(!p.idle_sleep(Some(400.), 90.));
+    assert!(p.play.auto_sleep);
+    assert!(p.companion.recovery_until.is_none());
+    assert!(p.idle_sleep(Some(0.), 95.));
+    assert!(!p.companion.resting);
+    assert_eq!(p.play.mode, Mode::Normal);
+}
+
+#[test]
+fn recovery_sleep_respects_pause_and_can_finish_without_idle_api() {
+    let mut p = pet();
+    p.companion.resting = true;
+    p.companion.recovery_until = Some(45.);
+    p.play.mode = Mode::Sleeping;
+    p.hold_for_menu(10.);
+    assert_eq!(p.companion.recovery_until, Some(55.));
+    p.brain.paused = true;
+    assert!(!p.idle_sleep(Some(0.), 60.));
+    assert!(p.companion.resting);
+    p.brain.paused = false;
+    assert!(p.idle_sleep(None, 61.));
+    assert!(!p.companion.resting);
+}
+
+#[test]
+fn everyday_routines_arrive_within_minutes_and_cycle_through_awake_activities() {
+    let mut p = pet();
+    p.settings.extras.last_gift_day = Some(crate::companion::extras::day());
+    let mut seen = std::collections::HashSet::new();
+    let mut now = 100.;
+    for _ in 0..9 {
+        p.interact(Activity::Idle, now - 60.);
+        p.companion.next_surprise = now;
+        p.maybe_surprise(now, false);
+        assert!(
+            p.companion.next_surprise <= now + 240.,
+            "Everyday routines are too far apart"
+        );
+        assert!(!matches!(
+            p.brain.activity,
+            Activity::Nap | Activity::CozyNap | Activity::Drowsy
+        ));
+        assert!(
+            seen.insert(p.brain.activity),
+            "Everyday routine repeated before the other activities had a turn"
+        );
+        now += 300.;
+    }
+    assert!(seen.contains(&Activity::Read));
+    assert!(seen.contains(&Activity::Dance));
+    assert!(seen.contains(&Activity::PlushHug));
+}
+
+#[test]
+fn paw_invitations_accept_a_hold_at_the_raised_paw_and_direct_actions_cancel_them() {
+    let mut p = pet();
+    p.offer_paw(0.);
+    let pointer = (
+        p.size().0 as f32 * 205. / 320.,
+        p.size().1 as f32 * 113. / 224.,
+    );
+    p.respond_to_paw(pointer, 1., false);
+    assert!(p.companion.paw_offer.is_some());
+    p.respond_to_paw(pointer, 1.81, false);
+    assert!(p.companion.paw_offer.is_none());
+    assert_eq!(p.brain.activity, Activity::HighFive);
+    assert_eq!(p.brain.started, 1.81);
+    p.offer_paw(20.);
+    p.respond_to_paw((900., 700.), 30., false);
+    assert!(p.companion.paw_offer.is_none());
+    assert_eq!(p.brain.activity, Activity::Idle);
+    p.offer_paw(40.);
+    p.feed(41.);
+    assert!(p.companion.paw_offer.is_none());
+    assert_eq!(p.brain.activity, Activity::Snack);
+}
+
+#[test]
+fn invitations_hold_for_menus_and_yield_to_low_battery_or_disabled_touch() {
+    let mut p = pet();
+    p.offer_paw(0.);
+    p.hold_for_menu(20.);
+    assert_eq!(p.companion.paw_offer.as_ref().unwrap().until, 30.);
+    p.brain.paused = true;
+    p.respond_to_paw((0., 0.), 31., false);
+    assert!(p.companion.paw_offer.is_some());
+    p.brain.paused = false;
+    p.respond_to_paw((0., 0.), 32., true);
+    assert!(p.companion.paw_offer.is_none());
+    p.offer_paw(40.);
+    p.settings.touch_enabled = false;
+    p.respond_to_paw((0., 0.), 41., false);
+    assert!(!p.quiet_busy());
+}
+
+#[test]
+fn welcome_back_has_a_small_followup_but_stays_simple_for_quiet_preferences() {
+    let mut p = pet();
+    p.welcome_back(10., false);
+    assert_eq!(p.brain.activity, Activity::Greet);
+    assert_eq!(p.companion.after_action, Some((14., Activity::Stretch)));
+    p.feed(11.);
+    assert!(p.companion.after_action.is_none());
+    p.settings.extras.ambient_surprises = false;
+    p.welcome_back(20., false);
+    assert!(p.companion.after_action.is_none());
+    p.settings.extras.ambient_surprises = true;
+    p.welcome_back(30., true);
+    assert!(p.companion.after_action.is_none());
 }

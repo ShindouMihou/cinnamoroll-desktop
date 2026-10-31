@@ -52,6 +52,10 @@ impl Scene {
                 ..
             } => {
                 if corner {
+                    if c.cozy_return.take().is_some() {
+                        c.item = None;
+                    }
+                    c.paw_offer = None;
                     let Some(window) = self.corner.as_ref() else {
                         return (None, false);
                     };
@@ -66,6 +70,11 @@ impl Scene {
                     ));
                     mouse.capture(true);
                 } else if let Some(item) = c.item.as_mut() {
+                    c.cozy_return = None;
+                    c.after_action = None;
+                    if item.kind == Kind::Plush {
+                        item.carried = false;
+                    }
                     if item.kind == Kind::KeepsakeBox {
                         item.stage ^= 128;
                         item.expires = now + 120.;
@@ -114,6 +123,11 @@ impl Scene {
                 ..
             } => {
                 if corner {
+                    c.paw_offer = None;
+                    if c.cozy_return.take().is_some() {
+                        c.item = None;
+                    }
+                    c.after_action = None;
                     c.resting = true;
                     c.study.paused = c.study.active();
                     return (Some(Activity::CozyNap), false);
@@ -134,6 +148,7 @@ impl Scene {
                         false
                     };
                 c.item = None;
+                c.cozy_return = None;
                 c.sniff_since = None;
                 mouse.capture(false);
                 return (None, saved);

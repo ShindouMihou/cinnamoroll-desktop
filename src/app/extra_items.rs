@@ -18,6 +18,32 @@ impl Pet {
             return false;
         };
         let kind = item.kind;
+        if kind == Kind::Plush
+            && item.carried
+            && let Some(visit) = self.companion.cozy_return
+        {
+            if now < visit.due {
+                return true;
+            }
+            let arrived = stationary || self.move_toward(visit.home, now, dt * 0.65, window, false);
+            if let Some(item) = self.companion.item.as_mut() {
+                item.position = (
+                    self.position.0 + size.0 as f32 * 0.65,
+                    self.position.1 + size.1 as f32 * 0.74,
+                );
+                item.expires = now + 60.;
+                if arrived {
+                    item.carried = false;
+                    item.activated = false;
+                    item.spontaneous = true;
+                }
+            }
+            if arrived {
+                self.companion.cozy_return = None;
+                self.start(Activity::Idle, now);
+            }
+            return true;
+        }
         if kind == Kind::Pillow && item.carried {
             if let Some(item) = self.companion.item.as_mut() {
                 item.position = (
@@ -144,7 +170,17 @@ impl Pet {
                 self.companion.tucked = true;
             }
             Kind::Tea | Kind::Plush | Kind::Palette if !held => {
-                self.companion.item = None;
+                if kind == Kind::Plush
+                    && let Some(visit) = self.companion.cozy_return.as_mut()
+                {
+                    visit.due = now + 10.;
+                    if let Some(item) = self.companion.item.as_mut() {
+                        item.carried = true;
+                        item.expires = now + 120.;
+                    }
+                } else {
+                    self.companion.item = None;
+                }
                 self.react(
                     match kind {
                         Kind::Tea => Activity::TeaSip,

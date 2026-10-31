@@ -64,6 +64,26 @@ impl Pet {
         };
     }
     pub(super) fn idle_sleep(&mut self, idle: Option<f64>, now: f64) -> bool {
+        if self
+            .companion
+            .recovery_until
+            .is_some_and(|until| now >= until)
+            && !self.brain.paused
+            && !self.hidden
+            && self.drag.is_none()
+        {
+            let computer_asleep = self.settings.sleep_after_minutes > 0
+                && idle.is_some_and(|seconds| {
+                    seconds >= f64::from(self.settings.sleep_after_minutes) * 60.
+                });
+            if computer_asleep {
+                self.companion.recovery_until = None;
+                self.play.auto_sleep = true;
+            } else {
+                self.interact(Activity::Greet, now);
+                return true;
+            }
+        }
         if self.quiet_busy() && !self.play.auto_sleep {
             return false;
         }

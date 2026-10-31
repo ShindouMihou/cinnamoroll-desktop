@@ -34,7 +34,8 @@ impl Pet {
         }
     }
     pub(super) fn touch_pointer(&mut self, now: f64) {
-        if self.companion.active_item()
+        if self.companion.paw_offer.is_some()
+            || self.companion.active_item()
             || self.play.feed_reward
             || !self.settings.touch_enabled
             || self.drag.is_some()
@@ -172,6 +173,9 @@ impl Pet {
         window: &mut Window,
         low_battery: bool,
     ) -> bool {
+        if self.companion.paw_offer.is_some() {
+            return true;
+        }
         let stationary = self.settings.reduced_motion || low_battery;
         let bounds = self.bounds();
         let size = self.size();
@@ -212,6 +216,15 @@ impl Pet {
             }
             return true;
         }
+        if let Some(visit) = self.companion.cozy_return {
+            if now >= visit.due
+                && (stationary || self.move_toward(visit.home, now, dt * 0.65, window, false))
+            {
+                self.companion.cozy_return = None;
+                self.start(Activity::Idle, now);
+            }
+            return true;
+        }
         if let Some(due) = self.companion.chase_return {
             if now < due {
                 return true;
@@ -225,6 +238,7 @@ impl Pet {
             if self.move_toward(target, now, dt * 0.6, window, false) {
                 self.companion.chase_return = None;
                 self.companion.resting = true;
+                self.companion.recovery_until = Some(now + 45.);
                 self.start(Activity::CozyNap, now);
                 self.play.mode = crate::play::Mode::Sleeping;
             }

@@ -29,7 +29,7 @@ Some days call for a study buddy. Some call for a tiny friend in a blanket.
 - **Bring the toys to him.** Offer treats, roll a ball, pop bubbles, follow a little star through shuffled cups, or try the ribbon, toy wand, and paper plane.
 - **Share a little wonder.** Brush his ears, offer a dandelion, shake a cloud snow globe, guide a tiny paper boat, and collect a few keepsakes. Quiet naps can bring little tappable dreams.
 - **Leave room for your work.** Place keep-clear zones from his pocket, undo the last drag, and remember cozy nooks when a display reconnects.
-- **Let little moments happen.** Spaced-out idle activities, shy smiles, ear wiggles, dancing, seasonal surprises, and optional nearby treats to offer.
+- **Let little moments happen.** Nine rotating awake routines, held-paw high-five invitations, a welcome-back stretch, and a plush to carry home. Surprise toys arrive with a wave; new settings enable nearby items by default. Quiet surprises wait through study and deliberate naps.
 - **Make him yours.** Bows, scarves, hats, little bags, palette play, and transparent sticker exports.
 - **Keep it comfortable.** Pet sizes, reduced motion, quiet-time controls, automatic sleep, and a clean native settings panel.
 
@@ -62,7 +62,7 @@ The Mac installer uses `/Applications`, with `~/Applications` as a fallback when
 
 Prefer a ZIP? Manual downloads work too.
 
-The latest feature update is **v0.2.0**. Downloads are available on the [Releases page](https://github.com/ShindouMihou/cinnamoroll-desktop/releases).
+The latest feature update is **v0.3.0**. Downloads are available on the [Releases page](https://github.com/ShindouMihou/cinnamoroll-desktop/releases).
 
 | Your computer | What to download | Then… |
 | --- | --- | --- |

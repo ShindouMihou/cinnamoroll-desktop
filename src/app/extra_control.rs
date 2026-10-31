@@ -172,7 +172,8 @@ impl Pet {
     }
     pub(super) fn maybe_surprise(&mut self, now: f64, low_battery: bool) {
         if self.companion.next_surprise == 0. {
-            self.companion.next_surprise = now + 360. + fastrand::f64() * 420.;
+            self.companion.next_surprise =
+                now + crate::companion::routine::Routine::delay(self.brain.quiet_seconds, true);
         }
         if now < self.companion.next_surprise
             || !self.settings.extras.ambient_surprises
@@ -189,7 +190,8 @@ impl Pet {
         {
             return;
         }
-        self.companion.next_surprise = now + 480. + fastrand::f64() * 420.;
+        self.companion.next_surprise =
+            now + crate::companion::routine::Routine::delay(self.brain.quiet_seconds, false);
         if self.settings.extras.last_gift_day != Some(crate::companion::extras::day())
             && fastrand::u8(..8) == 0
         {
@@ -202,14 +204,26 @@ impl Pet {
             Season::Birthday => Some(Activity::Birthday),
             Season::None => None,
         };
-        let choice = if fastrand::bool() { seasonal } else { None }.unwrap_or_else(|| {
-            [
-                Activity::EarWiggle,
-                Activity::Sneeze,
-                Activity::PlushHug,
-                Activity::TeaSip,
-            ][fastrand::usize(..4)]
-        });
+        let choice = if fastrand::u8(..4) == 0 {
+            seasonal
+        } else {
+            None
+        }
+        .unwrap_or_else(|| self.companion.routine.next());
+        if choice == Activity::Wave && self.settings.touch_enabled {
+            self.offer_paw(now);
+            return;
+        }
+        if choice == Activity::PlushHug && self.tidy_plush(now) {
+            return;
+        }
         self.interact(choice, now);
+        let linger = match choice {
+            Activity::Read => 18.,
+            Activity::TeaSip | Activity::Play => 12.,
+            Activity::PlushHug => 10.,
+            _ => 0.,
+        };
+        self.brain.until = self.brain.until.max(now + linger);
     }
 }
